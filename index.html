@@ -333,7 +333,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
         <button type="button" data-action="level" data-v="hard" id="lvHard">Hard</button>
       </div>
       <label class="toggle" for="decimalOpt"><input type="checkbox" id="decimalOpt"><span class="knob"></span><span id="decLab">Decimal × decimal</span></label>
-      <label class="toggle" for="helpers"><input type="checkbox" id="helpers" checked><span class="knob"></span>Helper numbers</label>
+      <label class="toggle" for="helpers"><input type="checkbox" id="helpers"><span class="knob"></span>Helper numbers</label>
       <button type="button" class="btn primary" data-action="new">New problem</button>
     </div>
   </header>
@@ -494,7 +494,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   /* ---------------- state ---------------- */
   const emptyCells = () => Array.from({length:7}, () => Array.from({length:7}, () => []));
   const S = {
-    mode:'mul', level:'easy', helpers:true, decimal:false,
+    mode:'mul', level:'easy', helpers:false, decimal:false,
     prob:null, phase:'lay', mi:0, partials:[],
     cells:emptyCells(), q:[0,0,0,0,0,0,0], tray:{},
     selected:null, wrong:[], msg:null, seq:1,
