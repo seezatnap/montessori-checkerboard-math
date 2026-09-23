@@ -123,7 +123,7 @@ body.armed .cell.active-row{cursor:copy}
 .cell .target.met{opacity:0}
 /* white multiplicand cards lie below their row, on the line between squares */
 .card{position:absolute; left:50%; bottom:0; transform:translate(-50%,50%); z-index:3; min-width:max(18px, calc(var(--cell)*.34)); height:max(18px, calc(var(--cell)*.34)); padding:0 2px; display:grid; place-items:center; border-radius:3px; pointer-events:none;
-  background:linear-gradient(#ffffff,#eeebe4); color:#2a241d; font:800 max(12px, calc(var(--cell)*.23))/1 "Alegreya",serif; font-variant-numeric:lining-nums;
+  background:linear-gradient(#ffffff,#eeebe4); color:var(--dc,#2a241d); font:800 max(12px, calc(var(--cell)*.23))/1 "Alegreya",serif; font-variant-numeric:lining-nums;
   box-shadow:0 0 0 1px rgba(0,0,0,.12), 0 2px 0 #b9b2a5, 0 3px 5px rgba(0,0,0,.35); animation:drop .3s cubic-bezier(.3,1.4,.5,1) backwards}
 /* black disk for the decimal point */
 .dpt{position:absolute; z-index:4; width:max(7px, calc(var(--cell)*.12)); height:max(7px, calc(var(--cell)*.12)); border-radius:50%; pointer-events:none;
@@ -149,14 +149,14 @@ body.armed .cell.active-row{cursor:copy}
 
 .tslot{position:relative; display:grid; place-items:center}
 .tile{width:calc(var(--cell)*.6); height:calc(var(--cell)*.6); display:grid; place-items:center; border-radius:6px;
-  background:linear-gradient(#dcdbd7,#b8b6b0);
-  color:#1d1a16; font:800 calc(var(--cell)*.38)/1 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums;
+  background:linear-gradient(rgba(255,255,255,.18),rgba(0,0,0,.14)), var(--dc,#b8b6b0);
+  color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.55); font:800 calc(var(--cell)*.38)/1 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums;
   box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 3px 0 #7f7c75, 0 7px 10px -5px rgba(0,0,0,.45);
   transition:transform .3s, box-shadow .2s, color .2s; animation:drop .35s cubic-bezier(.3,1.4,.5,1) both}
 .tile.current{box-shadow:0 0 0 3px var(--accent), 0 3px 0 #7f7c75, 0 10px 14px -6px rgba(0,0,0,.5); transform:translateX(-3px)}
 .tile{position:relative}
 /* turned face down: only the card being multiplied by shows its digit */
-.tile.down{color:transparent; background:repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 3px, transparent 3px 7px), linear-gradient(#8e8c86,#6f6d68); box-shadow:0 1px 0 rgba(255,255,255,.2) inset, 0 2px 0 #55534f}
+.tile.down{color:transparent; text-shadow:none; background:repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 3px, transparent 3px 7px), linear-gradient(#8e8c86,#6f6d68); box-shadow:0 1px 0 rgba(255,255,255,.2) inset, 0 2px 0 #55534f}
 .tile.hl{box-shadow:0 0 0 2px var(--accent), 0 3px 0 #7f7c75, 0 10px 14px -6px rgba(0,0,0,.5)}
 
 /* ---------- beads ---------- */
@@ -581,7 +581,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
       const cur = multiplying && m === curM(), down = multiplying && !cur;
       // black disk between the units card and the tenths card
       const dot = m === -1 ? '<span class="dpt" aria-hidden="true"></span>' : '';
-      tileR[r].innerHTML = dot + `<div class="tile ${cur ? 'current' : ''} ${down ? 'down' : ''}" title="Multiplier card: ${down ? 'turned face down' : d + ' ' + placeWord(m)}">${d}</div>`;
+      tileR[r].innerHTML = dot + `<div class="tile ${cur ? 'current' : ''} ${down ? 'down' : ''}" style="--dc:${sqColor(m)}" title="Multiplier card: ${down ? 'turned face down' : d + ' ' + placeWord(m)}">${d}</div>`;
     }
   }
   function renderCells(){
@@ -611,7 +611,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
       let card = '', chip = '';
       if (r === P.r0){
         const a = aDig(P.r0 - c);
-        if (a !== undefined) card = `<span class="card" title="Multiplicand card: ${a} ${placeWord(P.r0-c)}">${a}</span>`;
+        if (a !== undefined) card = `<span class="card" style="--dc:${sqColor(P.r0-c)}" title="Multiplicand card: ${a} ${placeWord(P.r0-c)}">${a}</span>`;
         if (P.p > 0 && c === P.r0 + 1) card += '<span class="dpt" aria-hidden="true"></span>';
       }
       const makeTens = `<button type="button" class="xchg" data-action="open-tens" data-r="${r}" data-c="${c}">Make tens</button>`;
