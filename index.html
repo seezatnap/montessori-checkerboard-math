@@ -1,0 +1,1530 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>Decimal Checkerboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;0,800;1,500;1,700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,500;1,700&display=swap">
+<style>
+:root{
+  --rug:#d5ccba; --pad:#e7e0d0; --pad-2:#dcd3c0; --chip:#f4efe4;
+  --ink:#2c2721; --ink-soft:#675e51; --stitch:rgba(72,56,38,.34);
+  --accent:#1f4c9b; --accent-ink:#ffffff; --good:#2f7d34; --warn:#b3412c;
+  --beech-hi:#f1d2a6; --beech:#ddb07b; --beech-lo:#bb8853; --wood-ink:#3b2a19;
+  --lift:0 1px 0 rgba(255,255,255,.5) inset, 0 16px 30px -20px rgba(45,30,15,.6);
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23f)' opacity='.65'/%3E%3C/svg%3E");
+  --fuzz:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23f)' opacity='.8'/%3E%3C/svg%3E");
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008 .42' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='200' filter='url(%23f)' opacity='.32'/%3E%3C/svg%3E");
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --rug:#212225; --pad:#2c2e32; --pad-2:#36383d; --chip:#3b3d42;
+    --ink:#ede6d9; --ink-soft:#aca293; --stitch:rgba(255,236,210,.22);
+    --accent:#7ea6ec; --accent-ink:#0c1930; --good:#86c979; --warn:#f08b6e;
+    --lift:0 1px 0 rgba(255,255,255,.05) inset, 0 18px 34px -18px rgba(0,0,0,.85);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --rug:#212225; --pad:#2c2e32; --pad-2:#36383d; --chip:#3b3d42;
+  --ink:#ede6d9; --ink-soft:#aca293; --stitch:rgba(255,236,210,.22);
+  --accent:#7ea6ec; --accent-ink:#0c1930; --good:#86c979; --warn:#f08b6e;
+  --lift:0 1px 0 rgba(255,255,255,.05) inset, 0 18px 34px -18px rgba(0,0,0,.85);
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100%;
+  background-color:var(--rug); background-image:var(--noise); background-blend-mode:soft-light;
+  color:var(--ink);
+  font:16px/1.45 "Alegreya Sans","Gill Sans","Trebuchet MS",system-ui,sans-serif;
+  padding-inline:16px;
+  -webkit-tap-highlight-color:transparent;
+}
+body.dragging, body.dragging *{cursor:grabbing!important}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.app{max-width:1260px; margin:0 auto; padding-block:20px 48px; display:flex; flex-direction:column; gap:20px}
+
+/* ---------- header ---------- */
+.topbar{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px 24px}
+.brand{display:flex; align-items:center; gap:14px}
+.stair{display:flex; align-items:flex-end; gap:3px; --b:6px}
+.brand h1{margin:0; font:800 clamp(28px,3.6vw,40px)/1 "Alegreya",Georgia,serif; letter-spacing:-.01em; text-wrap:balance}
+.brand p{margin:4px 0 0; color:var(--ink-soft); font-size:15px}
+.controls{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px}
+.seg{display:inline-flex; padding:4px; gap:2px; border-radius:999px; background:var(--pad); box-shadow:inset 0 1px 3px rgba(0,0,0,.2)}
+.seg button{appearance:none; border:0; background:transparent; color:var(--ink-soft); font:700 15px/1 "Alegreya Sans",sans-serif; padding:9px 14px; border-radius:999px; cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--pad); box-shadow:0 2px 6px -2px rgba(0,0,0,.5)}
+.toggle{display:inline-flex; align-items:center; gap:8px; font-weight:500; cursor:pointer; user-select:none; position:relative}
+.toggle input{position:absolute; opacity:0; width:1px; height:1px}
+.toggle .knob{width:40px; height:22px; flex:none; border-radius:999px; background:var(--pad-2); box-shadow:inset 0 1px 3px rgba(0,0,0,.35); position:relative; transition:background .2s}
+.toggle .knob::after{content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.95) 0 14%,transparent 46%),#d7352b; box-shadow:inset -2px -2px 3px rgba(0,0,0,.3); transition:transform .2s}
+.toggle input:checked + .knob{background:var(--accent)}
+.toggle input:checked + .knob::after{transform:translateX(18px)}
+.toggle input:focus-visible + .knob{outline:3px solid var(--accent); outline-offset:2px}
+
+.btn{appearance:none; border:0; border-radius:999px; padding:10px 16px; font:700 15px/1 "Alegreya Sans",sans-serif; cursor:pointer;
+  background:var(--chip); color:var(--ink);
+  box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 2px 0 rgba(0,0,0,.2), 0 6px 12px -8px rgba(0,0,0,.55); transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent); color:var(--accent-ink)}
+.btn:disabled{opacity:.45; cursor:not-allowed; transform:none}
+
+/* ---------- layout ---------- */
+.work{display:grid; grid-template-columns:minmax(0,1fr); gap:22px; align-items:start}
+@media (min-width:980px){ .work{grid-template-columns:minmax(0,1fr) 350px} }
+.board-area{display:flex; flex-direction:column; align-items:center; gap:16px; min-width:0}
+.side{display:flex; flex-direction:column; gap:16px; min-width:0}
+
+/* ---------- problem ---------- */
+.problem{text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px}
+.eyebrow{text-transform:uppercase; letter-spacing:.14em; font-size:12px; font-weight:700; color:var(--ink-soft)}
+.eq{font:700 clamp(32px,4.6vw,52px)/1.05 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums tabular-nums; display:flex; gap:.28em; align-items:baseline; flex-wrap:wrap; justify-content:center}
+.eq .op{color:var(--ink-soft); font-weight:500}
+.eq .ans{color:var(--accent)}
+.eq .ans.shown{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.note{margin:2px 0 0; color:var(--ink-soft); max-width:62ch; font-size:15px; text-wrap:balance}
+
+/* ---------- board ---------- */
+.board{
+  --cell:clamp(33px, calc((100vw - 36px) / 9.1), 76px);
+  display:grid; position:relative; user-select:none; -webkit-user-select:none;
+  grid-template-columns:calc(var(--cell)*.6) repeat(7,var(--cell)) calc(var(--cell)*.6) calc(var(--cell)*.85);
+  grid-template-rows:calc(var(--cell)*.5) repeat(7,var(--cell)) calc(var(--cell)*.5);
+}
+@media (min-width:980px){
+  .board{--cell:clamp(44px, min(calc((100vw - 470px) / 9.1), calc((100vh - 200px) / 8.2)), 88px)}
+}
+.frame{border-radius:7px;
+  background-image:var(--grain),linear-gradient(160deg,var(--beech-hi),var(--beech) 48%,var(--beech-lo));
+  background-blend-mode:multiply,normal;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset, 0 -2px 0 rgba(0,0,0,.14) inset, 0 3px 6px rgba(40,25,10,.25), 0 26px 44px -24px rgba(40,25,10,.75)}
+.bed{position:relative; z-index:3; pointer-events:none; box-shadow:inset 0 0 0 2px rgba(70,40,15,.55), inset 0 3px 7px rgba(0,0,0,.35)}
+.lab{position:relative; z-index:2; display:grid; place-items:center; white-space:nowrap; color:var(--wood-ink);
+  font:italic 500 clamp(8px, calc(var(--cell)*.165), 13px)/1 "Alegreya Sans",sans-serif; letter-spacing:.01em; font-variant-numeric:tabular-nums}
+.lab.side span{writing-mode:vertical-rl; transform:rotate(180deg)}
+.lab.rside span{writing-mode:vertical-rl}
+.thead{display:grid; place-items:end center; padding-bottom:2px; font:700 calc(var(--cell)*.32)/1 "Alegreya",serif; color:var(--ink-soft)}
+.cell{position:relative; z-index:1; outline-offset:-3px;
+  background-color:var(--sq); background-image:var(--fuzz); background-blend-mode:soft-light;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.14), inset 0 -10px 16px -12px rgba(0,0,0,.35), inset 0 8px 12px -12px rgba(255,255,255,.35);
+  transition:filter .25s}
+body.armed .cell.active-row{cursor:copy}
+.board.focus-row .cell:not(.active-row){filter:saturate(.62) brightness(.9)}
+.cell.active-row{box-shadow:inset 0 0 0 1px rgba(0,0,0,.14), inset 0 0 0 3px rgba(255,255,255,.5)}
+.cell.qrow{cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14), inset 0 0 0 3px rgba(255,255,255,.42)}
+.cell.qrow:hover{filter:brightness(1.1)}
+.cell .bars{position:absolute; inset:3px; display:flex; flex-wrap:wrap; align-content:center; justify-content:center; align-items:center; gap:var(--g,2px); z-index:1}
+.cell .target{position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; z-index:0;
+  font:italic 700 max(10px, calc(var(--cell)*.22))/1 "Alegreya",serif; color:rgba(255,255,255,.88); text-shadow:0 1px 2px rgba(0,0,0,.5); transition:opacity .3s}
+.cell .target.met{opacity:0}
+.card{position:absolute; left:3px; top:3px; z-index:3; min-width:max(16px, calc(var(--cell)*.3)); height:max(16px, calc(var(--cell)*.3)); padding:0 2px; display:grid; place-items:center; border-radius:4px; pointer-events:none;
+  background-image:var(--grain),linear-gradient(#fbf1dd,#ecd3a9); background-blend-mode:multiply,normal;
+  color:var(--wood-ink); font:800 max(11px, calc(var(--cell)*.21))/1 "Alegreya",serif; font-variant-numeric:lining-nums;
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 2px 0 #a97b4b, 0 3px 5px rgba(0,0,0,.35); animation:drop .3s cubic-bezier(.3,1.4,.5,1) backwards}
+.qplus{position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; z-index:0;
+  font:700 calc(var(--cell)*.36)/1 "Alegreya Sans",sans-serif; color:rgba(255,255,255,.75); text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.qminus{position:absolute; top:3px; right:3px; z-index:4; width:max(18px, calc(var(--cell)*.3)); height:max(18px, calc(var(--cell)*.3)); border-radius:50%; border:0; padding:0; cursor:pointer;
+  font:800 max(12px, calc(var(--cell)*.2))/1 "Alegreya Sans",sans-serif; background:#1d1a16; color:#f4efe4; box-shadow:0 2px 4px rgba(0,0,0,.35)}
+.count{position:absolute; right:3px; top:3px; z-index:2; min-width:1.5em; padding:0 .3em; border-radius:999px; pointer-events:none;
+  background:rgba(255,252,244,.93); color:#2a241d; text-align:center; font:800 max(9px, calc(var(--cell)*.16))/1.4 "Alegreya Sans",sans-serif; font-variant-numeric:tabular-nums; box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.count.big{background:#ffe7a3}
+.count.shift{right:calc(max(18px, var(--cell)*.3) + 6px)}
+.xchg{position:absolute; left:3px; bottom:3px; z-index:4; border:0; cursor:pointer; white-space:nowrap;
+  font:800 max(9px, calc(var(--cell)*.16))/1 "Alegreya Sans",sans-serif; padding:.4em .5em; border-radius:999px;
+  background:linear-gradient(#fffaf0,#f0ddb8); color:#3b2a19; box-shadow:0 2px 0 #b98652, 0 4px 8px rgba(0,0,0,.4);
+  animation:bob 1.8s ease-in-out infinite}
+/* hovering a square fades its card and count so every bead can be counted */
+.card, .count{transition:opacity .4s cubic-bezier(.4,0,.2,1)}
+.cell:hover .card, .cell:focus-visible .card, .cell:hover .count, .cell:focus-visible .count{opacity:.1}
+.cell.wrong{box-shadow:inset 0 0 0 3px #fff, inset 0 0 0 5px #1d1a16; animation:shake .4s}
+.cell.hint{animation:glow 1.1s ease-in-out 3}
+.cell.drop-ok{box-shadow:inset 0 0 0 3px rgba(255,255,255,.95), inset 0 0 18px rgba(255,255,255,.5)}
+.cell.drop-no{box-shadow:inset 0 0 0 3px rgba(20,15,10,.6); filter:saturate(.5)}
+.cell.diag{filter:brightness(1.15) saturate(1.15)}
+.cell.edge{box-shadow:inset 0 0 0 1px rgba(0,0,0,.14), inset 0 0 0 3px rgba(255,255,255,.3)}
+
+.tslot{position:relative; display:grid; place-items:center}
+.tile{width:calc(var(--cell)*.6); height:calc(var(--cell)*.6); display:grid; place-items:center; border-radius:6px;
+  background-image:var(--grain),linear-gradient(#f8e9cd,#e6c99b); background-blend-mode:multiply,normal;
+  color:var(--wood-ink); font:800 calc(var(--cell)*.38)/1 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums;
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 3px 0 #a97b4b, 0 7px 10px -5px rgba(0,0,0,.45);
+  transition:transform .3s, box-shadow .2s, color .2s; animation:drop .35s cubic-bezier(.3,1.4,.5,1) both}
+.tile.current{box-shadow:0 0 0 3px var(--accent), 0 3px 0 #a97b4b, 0 10px 14px -6px rgba(0,0,0,.5); transform:translateX(-3px)}
+.tile{position:relative}
+.tile.turned{color:rgba(59,42,25,.34); background-image:var(--grain),linear-gradient(#e3c89f,#cdab7b); box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 2px 0 #a97b4b}
+.tile.turned::after{content:"✓"; position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; display:grid; place-items:center;
+  font:800 11px/1 "Alegreya Sans",sans-serif; color:#fff; background:#3e8a3a; box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.tile.hl{box-shadow:0 0 0 2px var(--accent), 0 3px 0 #a97b4b, 0 10px 14px -6px rgba(0,0,0,.5)}
+
+/* ---------- beads ---------- */
+.bead{display:block; flex:none; width:var(--b); height:var(--b); border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 44%), var(--c);
+  box-shadow:inset calc(var(--b)*-.12) calc(var(--b)*-.15) calc(var(--b)*.22) rgba(0,0,0,.35), 0 0 0 .5px rgba(0,0,0,.22)}
+.bar{display:flex; flex:none; flex-direction:column; align-items:center; position:relative; padding-block:calc(var(--b)*.42)}
+.bar::before{content:""; position:absolute; top:0; bottom:0; left:50%; width:max(1px, calc(var(--b)*.16)); transform:translateX(-50%); background:#b98142; border-radius:3px}
+.bar .bead{position:relative}
+.bar.h{flex-direction:row; padding-block:0; padding-inline:calc(var(--b)*.42)}
+.bar.h::before{top:50%; bottom:auto; left:0; right:0; width:auto; height:max(1px, calc(var(--b)*.16)); transform:translateY(-50%)}
+.cell .bar[data-draggable]{cursor:grab; touch-action:none}
+.bar.lifted{opacity:.25}
+.ghost{position:fixed; left:0; top:0; z-index:80; pointer-events:none; filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
+.flyer{position:fixed; z-index:70; pointer-events:none}
+
+/* ---------- felt pads ---------- */
+.pad{position:relative; padding:18px; border-radius:16px;
+  background-color:var(--pad); background-image:var(--noise); background-blend-mode:soft-light; box-shadow:var(--lift)}
+.pad::after{content:""; position:absolute; inset:6px; border:1.5px dashed var(--stitch); border-radius:11px; pointer-events:none}
+.pad > *{position:relative; z-index:1}
+.pad-head{display:flex; flex-direction:column; gap:2px; margin-bottom:12px}
+.pad h2{margin:0; font:700 20px/1.2 "Alegreya",Georgia,serif}
+.pad .sub{color:var(--ink-soft); font-size:14px}
+
+.steps{list-style:none; margin:0 0 12px; padding:0; display:flex; flex-direction:column; gap:7px}
+.steps li{display:flex; align-items:center; gap:10px; color:var(--ink-soft); font-weight:500}
+.steps .dot{width:24px; height:24px; flex:none; border-radius:50%; display:grid; place-items:center; font:700 13px/1 "Alegreya",serif; background:var(--pad-2); color:var(--ink-soft)}
+.steps li.current{color:var(--ink); font-weight:800}
+.steps li.current .dot{background:var(--accent); color:var(--accent-ink)}
+.steps li.done .dot{background:var(--good); color:var(--pad)}
+.instr{margin:0 0 12px; font-size:15.5px; max-width:65ch}
+.instr b{font-weight:800}
+.instr .eg{display:block; margin-top:6px; color:var(--ink-soft); font-style:italic}
+.instr .aside{display:block; margin-top:8px; font-size:13.5px; color:var(--ink-soft)}
+.actions{display:flex; flex-wrap:wrap; gap:8px}
+.msg{margin:12px 0 0; padding:10px 12px; border-radius:10px; background:var(--pad-2); font-size:15px}
+.msg.good{background:color-mix(in srgb, var(--good) 22%, var(--pad))}
+.msg.warn{background:color-mix(in srgb, var(--warn) 20%, var(--pad))}
+.partial-row{display:flex; gap:8px; margin-bottom:10px}
+
+/* paper */
+.paper{margin-top:14px; padding:12px 16px 14px; border-radius:3px; color:#2a2520; transform:rotate(-.6deg);
+  background:repeating-linear-gradient(transparent 0 25px, #cfdcec 25px 26px) 0 12px / 100% 26px, #fbf8f1;
+  box-shadow:0 1px 2px rgba(0,0,0,.25), 0 10px 18px -12px rgba(0,0,0,.5);
+  display:grid; grid-template-columns:1.2em max-content max-content 1fr; column-gap:0; row-gap:0; align-items:end;
+  font:600 18px/26px "Alegreya",Georgia,serif; font-variant-numeric:lining-nums tabular-nums}
+.paper .pt{grid-column:1/-1; font:italic 500 13px/26px "Alegreya Sans",sans-serif; color:#7a6f60}
+.paper .op{color:#7a6f60}
+.paper .w{text-align:right}
+.paper .nt{padding-left:12px; font:italic 500 13px/26px "Alegreya Sans",sans-serif; color:#7a6f60}
+.paper .u{box-shadow:inset 0 -2px 0 #2a2520}
+.paper .tot{color:#1f4c9b; font-weight:800}
+
+/* substeps */
+.steps li.subwrap{display:block}
+.substeps{list-style:none; margin:0 0 2px 34px; padding:0; display:flex; flex-direction:column; gap:3px; font-size:14.5px}
+.substeps li{display:flex; gap:7px; align-items:center; color:var(--ink-soft); font-weight:500}
+.substeps li::before{content:""; width:8px; height:8px; flex:none; border-radius:50%; border:1.5px solid currentColor}
+.substeps li.done::before{background:var(--good); border-color:var(--good)}
+.substeps li.cur{color:var(--ink); font-weight:800}
+.substeps li.cur::before{background:var(--accent); border-color:var(--accent)}
+
+/* make-tens modal */
+body.modal-open{overflow:hidden}
+.modal-back{position:fixed; inset:0; z-index:85; display:flex; align-items:center; justify-content:center; padding:16px; overflow:auto; background:rgba(20,16,12,.55); backdrop-filter:blur(2px)}
+.modal{width:min(660px,100%); min-width:0; max-height:100%; overflow:auto}
+.m-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:14px}
+.m-x{appearance:none; border:0; background:transparent; font:400 28px/1 "Alegreya Sans",sans-serif; color:var(--ink-soft); cursor:pointer; padding:0 4px}
+.m-trays{display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:10px; align-items:start}
+.mtray{margin:0; display:flex; flex-direction:column; gap:6px; min-width:0}
+.mtray figcaption{font:700 14px/1.2 "Alegreya Sans",sans-serif; color:var(--ink-soft)}
+.mbars{height:clamp(140px, 30vw, 200px); border-radius:6px; padding:8px; display:flex; flex-wrap:wrap; align-content:center; justify-content:center; align-items:center; gap:var(--g,2px);
+  background-color:var(--sq); background-image:var(--fuzz); background-blend-mode:soft-light;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.18), inset 0 -12px 18px -12px rgba(0,0,0,.35)}
+#mRight .mbars{outline:2px dashed rgba(255,255,255,.7); outline-offset:-6px}
+#mRight .mbars.drop-ok{outline-style:solid}
+#mRight .bar{cursor:pointer}
+.mempty{color:#fff; font:italic 500 13.5px/1.3 "Alegreya Sans",sans-serif; text-align:center; padding:0 14px; text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.m-eq{align-self:center; margin-top:18px; font:800 34px/1 "Alegreya",serif; color:var(--ink-soft)}
+.mcount{font-size:13.5px; color:var(--ink-soft); font-variant-numeric:tabular-nums; min-height:1.3em}
+.beadbox.mbox{margin-top:14px}
+.beadbox.mbox .comp{--b:clamp(3px, .9vw, 5px); padding:15px 4px 6px}
+.modal .actions{margin-top:14px}
+
+/* bead box */
+.beadbox{display:flex; flex-direction:column; gap:7px; padding:9px; border-radius:10px;
+  background-image:var(--grain),linear-gradient(170deg,var(--beech-hi),var(--beech) 60%,var(--beech-lo)); background-blend-mode:multiply,normal;
+  box-shadow:0 1px 0 rgba(255,255,255,.5) inset, 0 -2px 0 rgba(0,0,0,.15) inset, 0 12px 20px -14px rgba(40,25,10,.7)}
+.beadbox.closed{filter:saturate(.55) brightness(.94)}
+.boxrow{display:grid; gap:7px}
+.comp{appearance:none; border:0; position:relative; min-width:0; padding:18px 4px 8px; border-radius:4px; cursor:grab; touch-action:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end; --b:clamp(4px, 1.5vw, 6.5px);
+  background:linear-gradient(#e7c392,#f5ddb9); box-shadow:inset 0 3px 6px rgba(90,55,20,.5), inset 0 -1px 0 rgba(255,255,255,.55)}
+.comp:disabled{cursor:not-allowed}
+.comp .num{position:absolute; left:7px; top:4px; font:italic 700 13px/1 "Alegreya",serif; color:var(--wood-ink); opacity:.75}
+.comp[aria-pressed="true"]{box-shadow:inset 0 3px 6px rgba(90,55,20,.5), 0 0 0 3px var(--accent); background:linear-gradient(#f3d6ae,#fff0d8)}
+.comp[aria-pressed="true"] .bar:first-of-type{transform:translateY(-4px) rotate(-6deg)}
+.decor{display:flex; align-items:flex-end; justify-content:center; gap:max(2px, calc(var(--b)*.45)); max-width:100%; overflow:hidden}
+
+/* cups */
+.cups{display:flex; flex-direction:column; gap:8px}
+.cup{display:grid; grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:"lab bowl n" "act act act"; gap:6px 10px; align-items:center; padding:8px 10px; border-radius:12px; background:var(--pad-2)}
+.cup.hint{box-shadow:0 0 0 3px #e8b23a}
+.cup-lab{grid-area:lab; min-width:64px; text-align:center; padding:4px 8px; border-radius:6px; font:italic 700 14px/1.2 "Alegreya Sans",sans-serif; font-variant-numeric:tabular-nums;
+  background-color:var(--sq); background-image:var(--fuzz); background-blend-mode:soft-light; color:var(--sqi)}
+.bowl{grid-area:bowl; min-height:28px; border-radius:999px; padding:5px 10px; box-shadow:inset 0 2px 6px rgba(0,0,0,.35); background:rgba(0,0,0,.07)}
+.loose{display:flex; flex-wrap:wrap; gap:2px; align-items:center; --b:9px}
+.loose em{font-style:normal; font-weight:700; font-size:13px; color:var(--ink-soft); margin-left:3px}
+.cup-n{grid-area:n; font:800 20px/1 "Alegreya",serif; font-variant-numeric:tabular-nums; min-width:2ch; text-align:right}
+.cup-act{grid-area:act; display:flex; gap:6px; justify-content:flex-end}
+.mini{appearance:none; border:0; border-radius:999px; padding:6px 10px; font:700 13px/1 "Alegreya Sans",sans-serif; cursor:pointer; background:var(--chip); color:var(--ink); box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.mini:disabled{opacity:.4; cursor:not-allowed}
+
+/* answer */
+.ansrow{display:flex; gap:8px; margin-top:6px}
+.ansrow input, .partial-row input{flex:1; min-width:0; font:700 22px/1.2 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums tabular-nums; padding:8px 12px; border-radius:10px; border:2px solid var(--stitch); background:var(--chip); color:var(--ink)}
+.ansrow input:disabled{opacity:.55}
+input.bad{border-color:var(--warn)!important; animation:shake .35s}
+.answer label{font:700 20px/1.2 "Alegreya",Georgia,serif}
+.ans-note{margin:10px 0 0; font-size:15px; color:var(--ink-soft)}
+.ans-note.good{color:var(--good); font-weight:700}
+.ans-note.warn{color:var(--warn)}
+.tally{margin-top:12px; font-size:14px; color:var(--ink-soft); display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; align-items:center}
+
+.rain{position:fixed; inset:0; pointer-events:none; z-index:90; overflow:hidden}
+.rain .bead{position:absolute; top:-24px; animation:fall linear forwards}
+
+@keyframes fall{to{transform:translateY(112vh) rotate(300deg)}}
+@keyframes pop{0%{transform:scale(.4); opacity:0}100%{transform:none; opacity:1}}
+@keyframes drop{0%{translate:0 -8px; opacity:0}100%{translate:0 0; opacity:1}}
+@keyframes bob{50%{transform:translateY(-2px)}}
+@keyframes shake{25%{translate:-3px 0}75%{translate:3px 0}}
+@keyframes glow{50%{box-shadow:inset 0 0 0 4px #ffe27a, inset 0 0 22px rgba(255,226,122,.8)}}
+
+@media (max-width:979px){ #toolPad{order:-1} }
+@media (max-width:560px){
+  .seg button{padding:8px 11px; font-size:14px}
+  .brand p{display:none}
+  .pad{padding:16px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important; transition:none!important}
+  /* a fade moves nothing, so the hover fade on cards and counts stays */
+  .card, .count{transition:opacity .4s cubic-bezier(.4,0,.2,1)!important}
+}
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="stair" id="stair" aria-hidden="true"></div>
+      <div>
+        <h1>Decimal Checkerboard</h1>
+        <p>Multiply and divide decimals with bead bars, the Montessori way.</p>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Operation">
+        <button type="button" data-action="mode" data-v="mul" id="modeMul">× Multiply</button>
+        <button type="button" data-action="mode" data-v="div" id="modeDiv">÷ Divide</button>
+      </div>
+      <div class="seg" role="group" aria-label="Level">
+        <button type="button" data-action="level" data-v="easy" id="lvEasy">Easy</button>
+        <button type="button" data-action="level" data-v="medium" id="lvMedium">Medium</button>
+        <button type="button" data-action="level" data-v="hard" id="lvHard">Hard</button>
+      </div>
+      <label class="toggle" for="decimalOpt"><input type="checkbox" id="decimalOpt"><span class="knob"></span><span id="decLab">Decimal × decimal</span></label>
+      <label class="toggle" for="helpers"><input type="checkbox" id="helpers" checked><span class="knob"></span>Helper numbers</label>
+      <button type="button" class="btn primary" data-action="new">New problem</button>
+    </div>
+  </header>
+
+  <main class="work">
+    <section class="board-area" aria-label="Checkerboard">
+      <div class="problem" id="problem"></div>
+      <div class="board" id="board"></div>
+    </section>
+    <aside class="side">
+      <div class="pad" id="stepsPad"></div>
+      <div class="pad" id="toolPad"></div>
+      <div class="pad answer">
+        <label for="answer" id="answerLab">Product</label>
+        <div class="ansrow">
+          <input id="answer" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="finish the beads first">
+          <button type="button" class="btn primary" data-action="check-answer" id="checkBtn">Check</button>
+        </div>
+        <p class="ans-note" id="ansNote" aria-live="polite"></p>
+        <div class="tally"><span id="tally"></span><button type="button" class="btn primary" data-action="new" id="nextBtn" hidden>Next problem →</button></div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div class="modal-back" id="modal" hidden>
+  <div class="pad modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="m-head">
+      <div><h2 id="mTitle">Make tens</h2><span class="sub">Build an equal set on the right: a golden ten-bar for every full ten, and one bar for the change.</span></div>
+      <button type="button" class="m-x" data-action="m-cancel" aria-label="Close">×</button>
+    </div>
+    <div class="m-trays">
+      <figure class="mtray" id="mLeft"><figcaption>On the square now</figcaption><div class="mbars"></div><span class="mcount"></span></figure>
+      <span class="m-eq" aria-hidden="true">=</span>
+      <figure class="mtray" id="mRight"><figcaption>Tens and change</figcaption><div class="mbars"></div><span class="mcount"></span></figure>
+    </div>
+    <div class="beadbox mbox" id="mBox"></div>
+    <p class="msg warn" id="mMsg" role="status" hidden></p>
+    <div class="actions">
+      <button type="button" class="btn primary" data-action="m-check">Check and swap</button>
+      <button type="button" class="btn" data-action="m-clear">Clear</button>
+      <button type="button" class="btn" data-action="m-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const BEAD = {1:'#d7352b',2:'#3e9a3c',3:'#f4a9bc',4:'#f4cd2c',5:'#73c7ec',6:'#8a67a6',7:'#f7f4ed',8:'#7a4827',9:'#1f3d9d',10:'#d9a62e'};
+  // compartments as in the classroom box: 10s and 9s; 8s, 7s, 6s; then 5s down to 1s in narrowing slots
+  const BOX_ROWS = [[10,9],[8,7,6],[5,4,3,2,1]];
+  const BOX_COLS = ['1fr 1fr', '1fr 1fr 1fr', '1.3fr 1.1fr 1.05fr .8fr .65fr'];
+  const BOX_DECOR = {10:7, 9:7, 8:5, 7:5, 6:5, 5:4, 4:4, 3:4, 2:3, 1:2};
+  const NUMW = ['no','one','two','three','four','five','six','seven','eight','nine'];
+  const WHOLE_SQ = ['#5e9f3b','#1f4c9b','#cd2f2c'];      // 1, 10, 100 (repeats by thousands)
+  const DEC_SQ = {1:'#7db9e3', 2:'#e2677c', 0:'#a8cf46'}; // 0.1, 0.01, 0.001 (repeats)
+  const PLACE = {'6':'millions','5':'hundred-thousands','4':'ten-thousands','3':'thousands','2':'hundreds','1':'tens','0':'units',
+    '-1':'tenths','-2':'hundredths','-3':'thousandths','-4':'ten-thousandths','-5':'hundred-thousandths','-6':'millionths'};
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ri = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+  const placeWord = m => PLACE[m];
+
+  const sqColor = e => e >= 0 ? WHOLE_SQ[e % 3] : DEC_SQ[(-e) % 3];
+  const sqInk = e => e >= 0 ? '#fff' : '#1d1a16';
+  function valueLabel(e){
+    if (e >= 0) return Math.pow(10,e).toLocaleString('en-US');
+    return '0.' + '0'.repeat(-e-1) + '1';
+  }
+  function fmtFixed(n, dec){
+    let s = String(Math.abs(n));
+    if (!dec) return s;
+    s = s.padStart(dec+1, '0');
+    return s.slice(0,-dec) + '.' + s.slice(-dec);
+  }
+  const trimZeros = s => s.includes('.') ? s.replace(/0+$/,'').replace(/\.$/,'') : s;
+  const microStr = v => trimZeros(fmtFixed(v, 6));
+  function parseMicro(str){
+    str = String(str).trim().replace(/[,\s]/g,'');
+    if (!/^\d*\.?\d*$/.test(str) || str === '' || str === '.') return null;
+    let [w, f=''] = str.split('.');
+    if (f.length > 6){ if (/[1-9]/.test(f.slice(6))) return -1; f = f.slice(0,6); }
+    return Number(w || '0') * 1e6 + Number(f.padEnd(6,'0'));
+  }
+  const sigDigits = n => String(n).replace(/^0+/,'').replace(/0+$/,'');
+  const digitAt = (int, dec, place) => Math.floor(int / Math.pow(10, place + dec)) % 10;
+  function digits(n, easy){
+    const a = [];
+    for (let i=0; i<n; i++) a.push(i === 0 || i === n-1 || easy ? ri(1,9) : ri(0,9));
+    return Number(a.join(''));
+  }
+
+  /* ---------------- problem generation ----------------
+     Layout follows the Montessori album (MRD Decimals Manual, 8C):
+     multiplicand cards lie ON the board, lowest digit on its square nearest the right edge;
+     multiplier cards go on the right edge, units card level with the multiplicand. */
+  function genMul(level, dec){
+    for (let t=0; t<500; t++){
+      let nA, p, nM, k = 0;
+      if (!dec){
+        if (level === 'easy'){ nA = ri(2,3); p = nA-1; nM = 1; }
+        else if (level === 'medium'){ nA = ri(3,4); p = ri(Math.max(1,nA-2), nA-1); nM = 2; }
+        else { nA = ri(4,5); p = ri(2, nA-1); nM = 3; }
+      } else {
+        if (level === 'easy'){ nA = ri(2,3); p = nA-1; nM = 1; k = 1; }
+        else if (level === 'medium'){ if (Math.random() < .25){ nA = 3; p = 0; nM = 2; k = 2; } else { nA = 3; p = 2; nM = 2; k = ri(1,2); } }
+        else { nA = ri(3,4); p = ri(1, nA-1); nM = ri(2,3); k = ri(1,2); }
+      }
+      const mTop = nM - 1 - k;
+      // album limits: multiplier no longer than multiplicand; everything must stay on the board
+      const nCards = Math.max(mTop,0) + k + 1; // includes a leading 0 units card, e.g. 0.25 → 0 2 5
+      if (nCards > nA || mTop > p || p + k > 6 || nA > 6) continue;
+      const aInt = digits(nA, level === 'easy');
+      let mInt = digits(nM, level === 'easy');
+      if (nM === 1 && k === 0 && mInt === 1) mInt = ri(2,9);
+      const aPlaces = []; for (let j=nA-1-p; j>=-p; j--) aPlaces.push(j);
+      const mPlaces = []; for (let m=Math.max(mTop,0); m>=-k; m--) mPlaces.push(m);
+      const seq = mPlaces.filter(m => digitAt(mInt,k,m) > 0).sort((a,b) => a-b);
+      return {type:'mul', aInt, p, mInt, k, r0: 6-p, aPlaces, mPlaces, seq,
+        Astr: fmtFixed(aInt,p), Mstr: fmtFixed(mInt,k), answer: aInt*mInt*Math.pow(10, 6-p-k)};
+    }
+  }
+  /* Division mirrors that layout: divisor on the right edge, quotient cards built on the board
+     in the row of the divisor's units card, dividend in cups. */
+  function genDiv(level, dec){
+    const nz = (lo,hi) => { let d; do { d = ri(lo,hi); } while (d % 10 === 0); return d; };
+    for (let t=0; t<500; t++){
+      let DInt, k = 0, qd, qWhole = 1;
+      if (!dec){
+        if (level === 'easy'){ DInt = ri(2,9); qd = 1; }
+        else if (level === 'medium'){ if (Math.random() < .6){ DInt = ri(2,9); qd = 2; } else { DInt = nz(11,19); qd = 1; } }
+        else { DInt = nz(12,49); qd = ri(2,3); }
+      } else {
+        if (level === 'easy'){ DInt = ri(2,9); k = 1; qd = 1; }
+        else if (level === 'medium'){ DInt = nz(12,48); k = 1; qd = ri(1,2); }
+        else { DInt = nz(12,49); k = ri(1,2); qd = 2; }
+        if (Math.random() < .4) qWhole = 2;
+      }
+      // The divisor's last card goes on the bottom row, so its units card (the quotient row)
+      // is known from the divisor alone, never from the answer.
+      const dTop = String(DInt).length - 1 - k, r0 = k, qTop = qWhole - 1;
+      if (r0 + dTop > 6 || r0 + qd > 6 || qTop > r0) continue;
+      const qInt = digits(qWhole + qd, level === 'easy');
+      const dPlaces = []; for (let m=Math.max(dTop,0); m>=-k; m--) dPlaces.push(m);
+      const dvInt = qInt * DInt, dvDec = qd + k;
+      return {type:'div', DInt, k, r0, qInt, qd, qTop, dPlaces, dvInt, dvDec,
+        Dstr: fmtFixed(DInt,k), dividendStr: trimZeros(fmtFixed(dvInt,dvDec)), qStr: fmtFixed(qInt,qd),
+        answer: qInt*Math.pow(10, 6-qd)};
+    }
+  }
+  function initTray(P){
+    const t = {}, s = String(P.dvInt);
+    for (let i=0; i<s.length; i++) t[i - P.dvDec] = Number(s[s.length-1-i]);
+    return t;
+  }
+
+  /* ---------------- state ---------------- */
+  const emptyCells = () => Array.from({length:7}, () => Array.from({length:7}, () => []));
+  const S = {
+    mode:'mul', level:'easy', helpers:true, decimal:false,
+    prob:null, phase:'lay', mi:0, partials:[],
+    cells:emptyCells(), q:[0,0,0,0,0,0,0], tray:{},
+    selected:null, wrong:[], msg:null, seq:1,
+    hintCell:null, hintCup:null, modal:null, mMsg:null
+  };
+  const fresh = new Set();
+  let solved = 0;
+  try { solved = Number(localStorage.getItem('decimal-checkerboard-solved')) || 0; } catch(e){}
+
+  const key = (r,c) => r + ',' + c;
+  const total = bars => bars.reduce((s,b) => s + b.n, 0);
+  const onL = (r,c) => r === 0 || c === 0;
+  const cellForE = e => e >= 0 ? [e,0] : [0,-e];
+  const MULTIPLYING = ['lay','group','rowx','partial'];
+  const GROUPING = ['group','fgroup'], EXCHANGING = ['rowx','exchange'];
+  const aDig = j => S.prob.aPlaces.includes(j) ? digitAt(S.prob.aInt, S.prob.p, j) : undefined;
+  const mDig = m => S.prob.mPlaces.includes(m) ? digitAt(S.prob.mInt, S.prob.k, m) : undefined;
+  const dDig = m => S.prob.dPlaces.includes(m) ? digitAt(S.prob.DInt, S.prob.k, m) : undefined;
+  const curM = () => S.prob.seq[S.mi];
+  const curRow = () => S.prob.r0 + curM();
+  function qDigAt(c){
+    const P = S.prob, j = P.r0 - c;
+    return (j > P.qTop || j < -P.qd) ? 0 : digitAt(P.qInt, P.qd, j);
+  }
+  function target(r,c){
+    const a = aDig(S.prob.r0 - c), d = mDig(curM());
+    return (a && d) ? a*d : 0;
+  }
+  function cellBars(r,c){
+    if (S.mode === 'mul') return S.cells[r][c];
+    const d = dDig(r - S.prob.r0), n = S.q[c];
+    if (!d || !n) return [];
+    return Array.from({length:n}, (_,i) => ({id:`d${r}-${c}-${i}`, n:d}));
+  }
+  const canBox = () => S.mode === 'mul' && S.phase === 'lay';
+  const trayKeys = () => Object.keys(S.tray).map(Number).sort((a,b) => b-a);
+  const trayEmpty = () => Object.values(S.tray).every(v => v === 0);
+  function rowValue(R){
+    let v = 0;
+    for (let c=0; c<7; c++) v += total(S.cells[R][c]) * Math.pow(10, R - c + 6);
+    return v;
+  }
+  function allOnL(){
+    for (let r=1; r<7; r++) for (let c=1; c<7; c++) if (S.cells[r][c].length) return false;
+    return true;
+  }
+  // Exchanging works along a "lane": the current row (right to left) or, after sliding,
+  // the edge squares from the smallest place to the largest.
+  const loose = bars => bars.reduce((s,b) => s + (b.n < 10 ? b.n : 0), 0);
+  const tensOf = bars => bars.filter(b => b.n === 10).length;
+  function laneCells(){
+    if (MULTIPLYING.includes(S.phase)){ const R = curRow(); return [6,5,4,3,2,1,0].map(c => [R,c]); }
+    const out = []; for (let e=-6; e<=6; e++) out.push(cellForE(e)); return out;
+  }
+  function nextInLane(r,c){
+    if (MULTIPLYING.includes(S.phase)) return c > 0 ? [r,c-1] : null;
+    return r - c < 6 ? cellForE(r-c+1) : null;
+  }
+  const inLane = (r,c) => laneCells().some(([a,b]) => a === r && b === c);
+  const laneNeedsGroup = () => laneCells().some(([r,c]) => loose(S.cells[r][c]) >= 10);
+  const laneHasTens = () => laneCells().some(([r,c]) => tensOf(S.cells[r][c]) > 0);
+  function activeCell(){
+    for (const [r,c] of laneCells()){ const b = S.cells[r][c]; if (tensOf(b) || loose(b) >= 10) return [r,c]; }
+    return null;
+  }
+  function setMsg(text, tone=''){ S.msg = text ? {text, tone} : null; }
+  function clearHints(){ S.hintCell = S.hintCup = null; }
+
+  /* ---------------- board construction ---------------- */
+  const board = $('#board');
+  const cellEls = {}, tileR = {};
+  let tileHead;
+  function buildBoard(){
+    board.innerHTML = '';
+    const add = (cls, col, row, html='') => {
+      const d = document.createElement('div');
+      d.className = cls; d.style.gridColumn = col; d.style.gridRow = row; d.innerHTML = html;
+      board.appendChild(d); return d;
+    };
+    add('frame', '1 / 10', '1 / 10');
+    for (let c=0; c<7; c++){
+      add('lab top', String(2+c), '1', valueLabel(6-c));
+      add('lab bottom', String(2+c), '9', valueLabel(-c));
+    }
+    for (let r=0; r<7; r++){
+      add('lab side', '1', String(8-r), `<span>${valueLabel(r)}</span>`);
+      add('lab rside', '9', String(8-r), `<span>${valueLabel(r-6)}</span>`);
+    }
+    for (let r=0; r<7; r++) for (let c=0; c<7; c++){
+      const el = add('cell', String(2+c), String(8-r), '<div class="target"></div><div class="bars"></div>');
+      el.dataset.r = r; el.dataset.c = c; el.tabIndex = 0;
+      el.style.setProperty('--sq', sqColor(r-c));
+      cellEls[key(r,c)] = el;
+    }
+    add('bed', '2 / 9', '2 / 9');
+    tileHead = add('thead', '10', '1');
+    for (let r=0; r<7; r++) tileR[r] = add('tslot', '10', String(8-r));
+  }
+
+  function boxHTML(compCls, attrs, boxCls=''){
+    return `<div class="beadbox ${boxCls}">${BOX_ROWS.map((row,i) => `<div class="boxrow" style="grid-template-columns:${BOX_COLS[i]}">${row.map(n =>
+      `<button type="button" class="comp ${compCls}" data-n="${n}" aria-label="${n === 10 ? 'Golden ten-bar' : n + '-bead bar'}" ${attrs(n)}><span class="num">${n}</span><span class="decor"></span></button>`).join('')}</div>`).join('')}</div>`;
+  }
+  function fillDecor(root){
+    root.querySelectorAll('.comp').forEach(comp => {
+      const n = Number(comp.dataset.n), d = comp.querySelector('.decor');
+      for (let i=0; i<BOX_DECOR[n]; i++) d.appendChild(barEl(n));
+    });
+  }
+  function barEl(n, id, horizontal){
+    const el = document.createElement('div');
+    el.className = 'bar' + (horizontal ? ' h' : '');
+    el.style.setProperty('--c', BEAD[n]);
+    el.dataset.n = n;
+    if (id) el.dataset.id = id;
+    for (let i=0; i<n; i++){ const b = document.createElement('i'); b.className = 'bead'; el.appendChild(b); }
+    return el;
+  }
+  function fitOne(nb, L, w, h, max){
+    for (let b = Math.min(max, h/(L+0.9)); b >= 1.2; b -= 0.25){
+      const g = Math.max(1, b*.35);
+      const cols = Math.max(1, Math.floor((w+g)/(b+g)));
+      const rows = Math.ceil(nb/cols);
+      if (rows*(L+0.9)*b + (rows-1)*g <= h) return {b, g};
+    }
+    return {b:1.2, g:1};
+  }
+  // bars stand upright, or lie sideways when that lets the beads be bigger (short, wide spaces)
+  function fit(nb, L, w, h, max=9){
+    const up = fitOne(nb, L, w, h, max), side = fitOne(nb, L, h, w, max);
+    return side.b > up.b + .4 ? {...side, side:true} : up;
+  }
+
+  /* ---------------- rendering ---------------- */
+  function captureRects(){
+    const m = new Map();
+    board.querySelectorAll('.bar[data-id]').forEach(el => m.set(el.dataset.id, el.getBoundingClientRect()));
+    return m;
+  }
+  function renderTiles(){
+    const P = S.prob;
+    tileHead.textContent = P.type === 'mul' ? '×' : '÷';
+    const multiplying = MULTIPLYING.includes(S.phase);
+    for (let r=0; r<7; r++){
+      const m = r - P.r0;
+      if (P.type === 'mul'){
+        const d = mDig(m);
+        if (d === undefined){ tileR[r].innerHTML = ''; continue; }
+        const cur = multiplying && m === curM();
+        const turned = (multiplying && m < curM()) || ['slide','fgroup','exchange','read'].includes(S.phase);
+        tileR[r].innerHTML = `<div class="tile ${cur ? 'current' : ''} ${turned ? 'turned' : ''}" title="Multiplier card: ${d} ${placeWord(m)}${turned ? ' (done; the album turns it over)' : ''}">${d}</div>`;
+      } else {
+        const d = dDig(m);
+        tileR[r].innerHTML = d === undefined ? '' : `<div class="tile" title="Divisor card: ${d} ${placeWord(m)}">${d}</div>`;
+      }
+    }
+  }
+  function renderCells(){
+    const prev = captureRects();
+    const cs = cellEls['0,0'].clientWidth;
+    // overlay sizes, mirroring the CSS for .card, .count, .qminus and .xchg
+    const chipH = Math.max(9, cs*.16)*1.8;
+    const P = S.prob, isMul = S.mode === 'mul';
+    const multiplying = isMul && MULTIPLYING.includes(S.phase);
+    const R = multiplying ? curRow() : -1;
+    board.classList.toggle('focus-row', multiplying);
+    const act = isMul && EXCHANGING.includes(S.phase) ? activeCell() : null;
+    for (let r=0; r<7; r++) for (let c=0; c<7; c++){
+      const el = cellEls[key(r,c)];
+      const bars = cellBars(r,c);
+      const tot = total(bars);
+      const tgtEl = el.querySelector('.target');
+      let tgt = '';
+      if (isMul && S.phase === 'lay' && S.helpers && r === R){
+        const a = aDig(P.r0 - c), d = mDig(curM());
+        if (a) tgt = `${d}×${a}`;
+      }
+      tgtEl.textContent = tgt;
+      tgtEl.classList.toggle('met', !!tgt && tot === target(r,c));
+      const draggable = (S.phase === 'lay' && r === R) || (isMul && S.phase === 'slide');
+      // overlays: cards lying on the board (multiplicand ×, quotient ÷), the count, the step button
+      let card = '', minus = '', plus = '', chip = '';
+      if (r === P.r0){
+        if (isMul){
+          const a = aDig(P.r0 - c);
+          if (a !== undefined) card = `<span class="card" title="Multiplicand card: ${a} ${placeWord(P.r0-c)}">${a}</span>`;
+        } else {
+          const n = S.q[c], done = S.phase === 'done';
+          if (n){
+            card = `<span class="card">${n}</span>`;
+            if (!done) minus = `<button type="button" class="qminus" data-action="qminus" data-c="${c}" aria-label="Take one back from the ${placeWord(P.r0-c)} of the quotient">−</button>`;
+          } else if (!done) plus = '<span class="qplus" aria-hidden="true">+</span>';
+        }
+      }
+      const makeTens = `<button type="button" class="xchg" data-action="open-tens" data-r="${r}" data-c="${c}">Make tens</button>`;
+      if (isMul && GROUPING.includes(S.phase) && loose(bars) >= 10 && inLane(r,c)) chip = makeTens;
+      if (act && act[0] === r && act[1] === c){
+        const nx = nextInLane(r,c);
+        chip = loose(bars) >= 10 ? makeTens
+          : `<button type="button" class="xchg" data-action="xchg" data-r="${r}" data-c="${c}" aria-label="Exchange a golden ten-bar on the ${valueLabel(r-c)} square for one bead on the ${valueLabel(nx[0]-nx[1])} square">${nx[1] === c ? "↑" : "←"} 10</button>`;
+      }
+      const count = tot && S.helpers
+        ? `<span class="count ${minus ? 'shift' : ''} ${loose(bars) >= 10 && isMul && S.phase !== 'lay' ? 'big' : ''}">${tot}</span>` : '';
+      // the card and count slide aside on hover (CSS), so beads use the full square;
+      // only a step button, which has to stay clickable, gets its own strip at the bottom
+      const top = 3;
+      let bottom = chip ? chipH + 6 : 3;
+      if (cs - top - bottom < 14) bottom = 3; // only on tiny phone squares does the button float over the beads
+      const wrap = el.querySelector('.bars');
+      wrap.innerHTML = '';
+      wrap.style.top = top + 'px'; wrap.style.bottom = bottom + 'px';
+      if (bars.length){
+        const L = Math.max(...bars.map(b => b.n));
+        const {b, g, side} = fit(bars.length, L, cs - 6, Math.max(8, cs - top - bottom));
+        wrap.style.setProperty('--b', b.toFixed(2) + 'px');
+        wrap.style.setProperty('--g', g.toFixed(2) + 'px');
+        wrap.classList.toggle('side', !!side);
+        const isAct = act && act[0] === r && act[1] === c && loose(bars) < 10;
+        bars.forEach(x => {
+          const be = barEl(x.n, x.id, side);
+          if (draggable || (isAct && x.n === 10)) be.dataset.draggable = '';
+          wrap.appendChild(be);
+        });
+      }
+      el.querySelectorAll('.count,.xchg,.card,.qminus,.qplus').forEach(n => n.remove());
+      el.insertAdjacentHTML('beforeend', card + minus + plus + count + chip);
+      el.classList.toggle('active-row', r === R);
+      el.classList.toggle('qrow', !isMul && r === P.r0 && S.phase !== 'done');
+      el.classList.toggle('wrong', S.wrong.includes(key(r,c)));
+      el.classList.toggle('hint', S.hintCell === key(r,c));
+      el.classList.toggle('edge', isMul && ['slide','fgroup','exchange'].includes(S.phase) && onL(r,c));
+      el.setAttribute('aria-label', `${valueLabel(r-c)} square, row ${valueLabel(r)}, column ${valueLabel(-c)}: ${tot} bead${tot === 1 ? '' : 's'}`);
+    }
+    if (!reduced){
+      let i = 0;
+      board.querySelectorAll('.bar[data-id]').forEach(el => {
+        const id = el.dataset.id, a = prev.get(id);
+        if (fresh.has(id) && !a){
+          el.animate([{transform:'scale(.2)', opacity:0},{transform:'none', opacity:1}], {duration:320, easing:'cubic-bezier(.3,1.5,.5,1)'});
+          return;
+        }
+        if (!a) return;
+        const b = el.getBoundingClientRect();
+        const dx = a.left - b.left, dy = a.top - b.top;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+        el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],
+          {duration:560, delay:Math.min(i++*12, 320), easing:'cubic-bezier(.3,.7,.2,1)', fill:'backwards'});
+      });
+    }
+    fresh.clear();
+  }
+
+  function renderProblem(){
+    const P = S.prob, done = S.phase === 'done';
+    const isMul = P.type === 'mul';
+    const a = isMul ? P.Astr : P.dividendStr, b = isMul ? P.Mstr : P.Dstr;
+    let note;
+    if (isMul){
+      note = `The multiplicand ${P.Astr} lies on the board, its last digit on the square nearest the right edge. The multiplier ${P.Mstr} goes on the right edge, its units card level with the multiplicand.`;
+    } else {
+      note = `Lay the divisor ${P.Dstr} on the right edge with its last card on the bottom row. The row of its units card${P.Dstr.startsWith('0') ? ' (the 0)' : ''} is where the quotient will be built. The dividend ${P.dividendStr} waits in the cups.`;
+    }
+    $('#problem').innerHTML =
+      `<div class="eyebrow">${isMul ? 'Multiplication' : 'Division'} · ${cap(S.level)}${S.decimal ? (isMul ? ' · decimal multiplier' : ' · decimal divisor') : ''}</div>
+       <div class="eq"><span>${a}</span><span class="op">${isMul ? '×' : '÷'}</span><span>${b}</span><span class="op">=</span><span class="ans ${done ? 'shown' : ''}">${done ? microStr(P.answer) : '?'}</span></div>
+       <p class="note">${note}</p>`;
+  }
+
+  const ROW_SUBSTEPS = [['lay','Lay the bars'],['group','Make tens'],['rowx','Exchange tens, right to left'],['partial','Write the partial product']];
+  function stepList(){
+    if (S.mode === 'mul') return [...S.prob.seq.map(m => `Multiply by the ${mDig(m)} card (${placeWord(m)})`), 'Slide down the diagonals', 'Make tens', 'Exchange tens, right to left', 'Read the product'];
+    return ['Share out the dividend', 'Read the quotient'];
+  }
+  function stepIndex(){
+    if (S.mode === 'mul'){
+      const n = S.prob.seq.length;
+      if (MULTIPLYING.includes(S.phase)) return S.mi;
+      return {slide:n, fgroup:n+1, exchange:n+2, read:n+3, done:n+4}[S.phase];
+    }
+    return {distribute:0, read:1, done:2}[S.phase];
+  }
+  function instruction(){
+    const P = S.prob;
+    if (S.mode === 'mul'){
+      if (S.phase === 'lay'){
+        const m = curM(), d = mDig(m);
+        const jx = P.aPlaces[P.aPlaces.length-1], a = aDig(jx);
+        const where = m === 0 ? 'on the same squares as the multiplicand cards'
+          : m > 0 ? `${m} row${m > 1 ? 's' : ''} above the multiplicand cards` : `${-m} row${m < -1 ? 's' : ''} below the multiplicand cards`;
+        const first = S.mi === 0 ? ' Always begin with the lowest card of the multiplier.' : '';
+        return `Multiply by the <b>${d}</b> card (${placeWord(m)}).${first} Its bars go ${where}, in the lit row. For each multiplicand card, lay that digit's bar ${NUMW[d]} time${d > 1 ? 's' : ''}.
+          <span class="eg">For the ${a} card: ${NUMW[d]} ${a}-bar${d > 1 ? 's' : ''} ${m === 0 ? 'on its square' : m > 0 ? 'above it' : 'below it'}.</span>`;
+      }
+      if (S.phase === 'group') return laneNeedsGroup()
+        ? `Before exchanging, tidy each crowded square. Tap <b>Make tens</b> and build an equal set: a golden ten-bar for every full ten, plus one bar for the change.`
+        : laneHasTens() ? `Every square in this row is already in golden ten-bars and change, so there is nothing to make into tens. Continue to exchange the tens.`
+        : `No square in this row holds ten or more beads, so there is nothing to make into tens or exchange.`;
+      if (S.phase === 'rowx') return `Now exchange <b>right to left</b>. Tap <b>← 10</b>, or drag the golden ten-bar onto the square to its left: the ten-bar leaves and one bead arrives there. If a square reaches ten again, make tens there first.`;
+      if (S.phase === 'partial') return `Read this row as a number (each square's beads are one digit, the square gives the place) and write the <b>partial product</b> on your paper.`;
+      if (S.phase === 'slide') return `Every multiplier card is turned over. Move all the bars <b>down the diagonal</b> to the lowest row (whole numbers stop at the left column), or press Slide all.`;
+      if (S.phase === 'fgroup') return laneNeedsGroup()
+        ? `The edge squares hold the sums of the diagonals. Tap <b>Make tens</b> on each crowded square and build its tens and change.`
+        : laneHasTens() ? `Every edge square is already in golden ten-bars and change, so there is nothing to make into tens. Continue to exchange the tens.`
+        : `No edge square holds ten or more beads, so there is nothing to make into tens or exchange.`;
+      if (S.phase === 'exchange') return `Exchange from the smallest square to the largest: along the bottom row to the corner, then up the left column. Tap <b>← 10</b> (<b>↑ 10</b> on the left column), or drag the golden ten-bar onto the next square.`;
+      if (S.phase === 'read') return `Read the whole numbers up the left column and the decimals along the bottom row; the 1 square in the corner is the units. Write the product.`;
+      return `Solved: ${P.Astr} × ${P.Mstr} = <b>${microStr(P.answer)}</b>.`;
+    }
+    const aside = `<span class="aside">The Montessori albums teach decimal division on the decimal board. This division mode is this game's own mirror of the album's checkerboard multiplication.</span>`;
+    if (S.phase === 'distribute') return `The divisor's last card sits on the bottom row, so its units card marks the quotient row (lit). Tap a square in that row to add one to that place of the quotient. For each divisor card, that many beads move from the matching cup to the square in the card's row. Start with the largest place. When a cup runs short, <b>break</b> a bead from the cup above into ten.${aside}`;
+    if (S.phase === 'read') return `Every bead has been shared out, with none left over. Read the quotient cards in the lit row; the card on the green 1 square is the units digit.`;
+    return `Solved: ${P.dividendStr} ÷ ${P.Dstr} = <b>${trimZeros(P.qStr)}</b>.`;
+  }
+  function actionButtons(){
+    if (S.phase === 'done') return `<button type="button" class="btn primary" data-action="new">Next problem →</button>`;
+    const hint = `<button type="button" class="btn" data-action="hint">Hint</button>`;
+    if (S.mode === 'mul'){
+      if (S.phase === 'lay') return `<button type="button" class="btn primary" data-action="check-layout">Check this row</button>${hint}<button type="button" class="btn" data-action="clear">Clear row</button>`;
+      if (GROUPING.includes(S.phase)) return laneNeedsGroup() ? hint : `<button type="button" class="btn primary" data-action="skip-group">Continue</button>`;
+      if (S.phase === 'rowx') return hint;
+      if (S.phase === 'partial') return hint;
+      if (S.phase === 'slide') return `<button type="button" class="btn primary" data-action="slide-all">Slide all</button>${hint}`;
+      if (S.phase === 'exchange') return hint;
+      return hint;
+    }
+    if (S.phase === 'distribute') return `${hint}<button type="button" class="btn" data-action="reset-div">Start over</button>`;
+    return hint;
+  }
+  function paperHTML(){
+    if (S.mode !== 'mul') return '';
+    const P = S.prob;
+    // numbers line up on the decimal point; an underline is drawn under the row that closes a sum
+    const line = (op, num, note='', cls='') => {
+      const [w, f] = num.split('.');
+      return `<span class="op">${op}</span><span class="w ${cls}">${w}</span><span class="f ${cls}">${f !== undefined ? '.' + f : ''}</span><span class="nt">${note}</span>`;
+    };
+    const last = S.partials.length - 1;
+    let h = `<div class="paper" aria-label="Your paper"><span class="pt">Your paper</span>` + line('', P.Astr) + line('×', P.Mstr, '', 'u');
+    S.partials.forEach((pp,i) => {
+      const note = `${P.Astr} × ${trimZeros(fmtFixed(pp.d, Math.max(0,-pp.m)) + '0'.repeat(Math.max(0,pp.m)))}`;
+      h += line(i === 0 || S.partials.length < 2 ? '' : '+', microStr(pp.v), note, S.phase === 'done' && i === last ? 'u' : '');
+    });
+    if (S.phase === 'done') h += line('', microStr(P.answer), 'product', 'tot');
+    return h + '</div>';
+  }
+  function subSteps(isCurrent){
+    if (!isCurrent || S.mode !== 'mul' || !MULTIPLYING.includes(S.phase)) return '';
+    const k = ROW_SUBSTEPS.findIndex(x => x[0] === S.phase);
+    return `<li class="subwrap"><ol class="substeps">${ROW_SUBSTEPS.map((x,i) => `<li class="${i < k ? 'done' : i === k ? 'cur' : ''}">${x[1]}</li>`).join('')}</ol></li>`;
+  }
+  function renderSteps(){
+    const steps = stepList(), idx = stepIndex();
+    const partial = S.phase === 'partial'
+      ? `<div class="partial-row"><input id="partial" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Partial product" placeholder="partial product"><button type="button" class="btn primary" data-action="check-partial">Write it</button></div>` : '';
+    $('#stepsPad').innerHTML =
+      `<ol class="steps">${steps.map((s,i) =>
+        `<li class="${i < idx ? 'done' : i === idx ? 'current' : ''}"><span class="dot">${i < idx ? '✓' : i+1}</span>${s}</li>` + subSteps(i === idx)).join('')}</ol>
+       <p class="instr">${instruction()}</p>
+       ${partial}
+       <div class="actions">${actionButtons()}</div>
+       <p class="msg ${S.msg ? S.msg.tone : ''}" id="msg" role="status" ${S.msg ? '' : 'hidden'}>${S.msg ? S.msg.text : ''}</p>
+       ${paperHTML()}`;
+  }
+  function renderTool(){
+    const pad = $('#toolPad');
+    if (S.mode === 'mul'){
+      const on = canBox();
+      const sub = on
+        ? (S.selected ? `Holding the ${S.selected}-bar. Tap squares in the lit row to lay it down; tap the compartment again (or press Esc) to put it back.` : 'Tap a compartment to pick up a bar, or drag one straight onto the lit row.')
+        : 'Closed for now. Open again when the next multiplier card comes up.';
+      pad.innerHTML =
+        `<div class="pad-head"><h2>Bead box</h2><span class="sub">${sub}</span></div>
+         ${boxHTML('', n => `aria-pressed="${S.selected === n}" ${on ? '' : 'disabled'}`, on ? '' : 'closed')}`;
+      fillDecor(pad);
+    } else {
+      const keys = trayKeys(), maxE = keys[0], minE = keys[keys.length-1];
+      pad.innerHTML =
+        `<div class="pad-head"><h2>Dividend cups</h2><span class="sub">${S.prob.dividendStr} as loose beads, one cup per place.</span></div>
+         <div class="cups">${keys.map(e => {
+           const n = S.tray[e], shown = Math.min(n, 30);
+           return `<div class="cup ${S.hintCup === e ? 'hint' : ''}" data-cup="${e}">
+             <span class="cup-lab" style="--sq:${sqColor(e)};--sqi:${sqInk(e)}">${valueLabel(e)}</span>
+             <div class="bowl"><div class="loose" style="--c:${sqColor(e)}">${'<i class="bead"></i>'.repeat(shown)}${n > shown ? `<em>+${n-shown}</em>` : ''}</div></div>
+             <b class="cup-n">${n}</b>
+             <div class="cup-act">
+               <button type="button" class="mini" data-action="break" data-e="${e}" ${n > 0 && e > minE && S.phase !== 'done' ? '' : 'disabled'} title="Trade one ${valueLabel(e)} bead for ten ${valueLabel(e-1)} beads">Break into ten ↓</button>
+               <button type="button" class="mini" data-action="bundle" data-e="${e}" ${n >= 10 && e < maxE && S.phase !== 'done' ? '' : 'disabled'} title="Trade ten ${valueLabel(e)} beads for one ${valueLabel(e+1)} bead">Bundle ten ↑</button>
+             </div></div>`;
+         }).join('')}</div>`;
+    }
+  }
+  function renderAnswer(){
+    const input = $('#answer');
+    const ready = S.phase === 'read';
+    $('#answerLab').textContent = S.mode === 'mul' ? 'Product' : 'Quotient';
+    input.disabled = !ready;
+    input.placeholder = ready ? 'type it, e.g. 12.35' : S.phase === 'done' ? '' : 'finish the beads first';
+    $('#checkBtn').disabled = !ready;
+    $('#nextBtn').hidden = S.phase !== 'done';
+    $('#tally').textContent = `Solved on this device: ${solved}`;
+  }
+  function renderControls(){
+    $('#modeMul').setAttribute('aria-pressed', S.mode === 'mul');
+    $('#modeDiv').setAttribute('aria-pressed', S.mode === 'div');
+    ['easy','medium','hard'].forEach(l => $('#lv' + cap(l)).setAttribute('aria-pressed', S.level === l));
+    $('#helpers').checked = S.helpers;
+    $('#decimalOpt').checked = S.decimal;
+    $('#decLab').textContent = S.mode === 'mul' ? 'Decimal × decimal' : 'Decimal ÷ decimal';
+    document.body.classList.toggle('armed', !!S.selected);
+  }
+  function render(){
+    renderControls(); renderProblem(); renderTiles(); renderCells(); renderSteps(); renderTool(); renderAnswer(); renderModal();
+  }
+
+  /* ---------------- animation helpers ---------------- */
+  function fly(fromEl, toEl, count, color){
+    if (reduced || !fromEl || !toEl) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    for (let i=0; i<Math.min(count, 14); i++){
+      const s = document.createElement('i');
+      s.className = 'bead flyer';
+      s.style.setProperty('--c', color); s.style.setProperty('--b', '9px');
+      const sx = a.left + a.width/2 + (Math.random()-.5)*a.width*.5, sy = a.top + a.height/2 + (Math.random()-.5)*a.height*.4;
+      const ex = b.left + b.width/2 + (Math.random()-.5)*b.width*.35, ey = b.top + b.height/2 + (Math.random()-.5)*b.height*.35;
+      s.style.left = (sx-4.5) + 'px'; s.style.top = (sy-4.5) + 'px';
+      document.body.appendChild(s);
+      const an = s.animate([
+        {transform:'translate(0,0) scale(1)', opacity:1},
+        {transform:`translate(${(ex-sx)*.5}px, ${(ey-sy)*.5 - 30}px) scale(1.15)`, opacity:1, offset:.5},
+        {transform:`translate(${ex-sx}px, ${ey-sy}px) scale(.7)`, opacity:.15}
+      ], {duration:560 + i*35, easing:'cubic-bezier(.45,0,.25,1)'});
+      an.onfinish = () => s.remove();
+    }
+  }
+  function celebrate(){
+    if (reduced) return;
+    const layer = document.createElement('div');
+    layer.className = 'rain';
+    for (let i=0; i<40; i++){
+      const b = document.createElement('i');
+      b.className = 'bead';
+      b.style.setProperty('--c', BEAD[1 + i % 9]);
+      b.style.setProperty('--b', (9 + Math.random()*9).toFixed(1) + 'px');
+      b.style.left = (Math.random()*100) + '%';
+      b.style.animationDelay = (Math.random()*.7).toFixed(2) + 's';
+      b.style.animationDuration = (1.5 + Math.random()*1.1).toFixed(2) + 's';
+      layer.appendChild(b);
+    }
+    document.body.appendChild(layer);
+    setTimeout(() => layer.remove(), 3400);
+  }
+
+  /* ---------------- multiplication actions ---------------- */
+  function rowGuard(r){
+    if (r === curRow()) return true;
+    setMsg(`Right now you're multiplying by the ${mDig(curM())} card, so its bars go in the lit row, level with that card.`, 'warn');
+    render();
+    return false;
+  }
+  function addBar(r,c,n){
+    if (!canBox() || !rowGuard(r)) return;
+    const id = 'b' + (S.seq++);
+    S.cells[r][c].push({id, n});
+    fresh.add(id);
+    S.wrong = []; clearHints();
+    if (S.msg && S.msg.tone === 'warn') setMsg(null);
+    render();
+  }
+  function findBar(id){
+    for (let r=0; r<7; r++) for (let c=0; c<7; c++){
+      const i = S.cells[r][c].findIndex(b => b.id === id);
+      if (i >= 0) return {r, c, i};
+    }
+    return null;
+  }
+  function moveBar(id, r2, c2){
+    const f = findBar(id); if (!f) return;
+    const [bar] = S.cells[f.r][f.c].splice(f.i, 1);
+    S.cells[r2][c2].push(bar);
+    S.wrong = []; clearHints();
+    if (S.phase === 'slide' && allOnL()) finishSlide();
+    else if (S.msg && S.msg.tone === 'warn') setMsg(null);
+    render();
+  }
+  function removeBar(id){
+    const f = findBar(id); if (!f) return;
+    S.cells[f.r][f.c].splice(f.i, 1);
+    S.wrong = []; clearHints();
+    setMsg('Bar put back in the box.');
+    render();
+  }
+  function checkLayout(){
+    const R = curRow(), wrong = [];
+    let empty = true;
+    for (let c=0; c<7; c++){
+      const t = total(S.cells[R][c]);
+      if (t) empty = false;
+      if (t !== target(R,c)) wrong.push(key(R,c));
+    }
+    clearHints();
+    if (empty) setMsg('This row is empty. Lay out some bead bars first.', 'warn');
+    else if (wrong.length){
+      S.wrong = wrong;
+      setMsg(`${wrong.length} square${wrong.length > 1 ? 's don’t' : ' doesn’t'} match yet (outlined). Each needs the multiplier card's digit × the multiplicand digit in beads.`, 'warn');
+    } else {
+      S.wrong = []; S.selected = null;
+      S.phase = 'group';
+      setMsg(laneNeedsGroup() ? 'The row is right. Next, make tens on the crowded squares.' : 'The row is right.', 'good');
+    }
+    render();
+  }
+  function checkPartial(){
+    const input = $('#partial'), msgEl = $('#msg');
+    const v = parseMicro(input.value), want = rowValue(curRow());
+    if (v === want){
+      S.partials.push({m:curM(), d:mDig(curM()), v:want});
+      S.mi++; clearHints();
+      if (S.mi < S.prob.seq.length){
+        S.phase = 'lay';
+        setMsg(`Written. The card is turned over. Next, multiply by the ${mDig(curM())} card (${placeWord(curM())}).`, 'good');
+      } else if (allOnL()) finishSlide();
+      else { S.phase = 'slide'; setMsg('Every partial product is written. Now move the bars down the diagonals.', 'good'); }
+      render();
+      return;
+    }
+    input.classList.remove('bad'); void input.offsetWidth; input.classList.add('bad');
+    msgEl.hidden = false; msgEl.className = 'msg warn';
+    msgEl.textContent = v === null ? 'Type the number, like 18.534.'
+      : (v >= 0 && sigDigits(v) === sigDigits(want)) ? 'The digits are right. Check the decimal point: which square is the units?'
+      : 'Not quite. Read the lit row from left to right: each square’s bead count is one digit.';
+  }
+  function finishSlide(){
+    S.phase = 'fgroup';
+    setMsg(laneNeedsGroup() ? 'Every bar is on the edge. Next, make tens on the crowded squares.' : 'Every bar is on the edge.', 'good');
+  }
+  function slideAll(){
+    for (let r=1; r<7; r++) for (let c=1; c<7; c++){
+      const bars = S.cells[r][c]; if (!bars.length) continue;
+      const [tr,tc] = cellForE(r-c);
+      S.cells[tr][tc].push(...bars);
+      S.cells[r][c] = [];
+    }
+    clearHints(); finishSlide(); render();
+  }
+  function afterExchangeStep(){
+    clearHints();
+    const row = MULTIPLYING.includes(S.phase);
+    if (GROUPING.includes(S.phase) && !laneNeedsGroup() && laneHasTens()){
+      S.phase = row ? 'rowx' : 'exchange';
+      setMsg('Every crowded square is now tens and change. Exchange the tens, right to left.', 'good');
+    } else if (EXCHANGING.includes(S.phase) && !activeCell()){
+      S.phase = row ? 'partial' : 'read';
+      setMsg(row ? 'The row is exchanged: every square holds fewer than ten beads. Read it and write the partial product.'
+                 : 'Every square holds fewer than ten beads. Read the product.', 'good');
+    }
+    render();
+  }
+  function skipGroup(){
+    if (laneNeedsGroup()) return;
+    const row = MULTIPLYING.includes(S.phase);
+    if (laneHasTens()){
+      // ten-bars laid straight from the box still have to be exchanged
+      S.phase = row ? 'rowx' : 'exchange';
+      setMsg('Everything is already in tens and change. Exchange the tens, right to left.', 'good');
+    } else {
+      S.phase = row ? 'partial' : 'read';
+      setMsg(row ? 'Nothing to exchange. Read the row and write the partial product.' : 'Nothing to exchange. Read the product.', 'good');
+    }
+    render();
+  }
+  function exchangeTen(r,c){
+    const a = activeCell();
+    if (!a || a[0] !== r || a[1] !== c){ setMsg('Exchange right to left: start with the smallest square that still has a ten-bar.', 'warn'); return render(); }
+    const bars = S.cells[r][c];
+    if (loose(bars) >= 10) return openTens(r,c);
+    const i = bars.findIndex(b => b.n === 10), nx = nextInLane(r,c);
+    if (i < 0 || !nx) return;
+    bars.splice(i, 1);
+    const id = 'b' + (S.seq++);
+    S.cells[nx[0]][nx[1]].push({id, n:1});
+    fresh.add(id);
+    fly(cellEls[key(r,c)], cellEls[key(nx[0],nx[1])], 10, BEAD[10]);
+    setMsg(null);
+    afterExchangeStep();
+  }
+
+  /* ---------------- make-tens modal ---------------- */
+  function canOpenTens(r,c){
+    if (S.mode !== 'mul' || loose(S.cells[r][c]) < 10 || !inLane(r,c)) return false;
+    if (GROUPING.includes(S.phase)) return true;
+    if (EXCHANGING.includes(S.phase)){ const a = activeCell(); return !!a && a[0] === r && a[1] === c; }
+    return false;
+  }
+  function openTens(r,c){
+    if (!canOpenTens(r,c)) return;
+    S.modal = {r, c, right:[]}; S.mMsg = null;
+    render();
+    setTimeout(() => document.querySelector('#mBox .comp')?.focus(), 0);
+  }
+  function closeTens(){ S.modal = null; S.mMsg = null; render(); }
+  function mAdd(n){
+    if (!S.modal) return;
+    const id = 'b' + (S.seq++);
+    S.modal.right.push({id, n}); S.mMsg = null;
+    renderModal(id);
+  }
+  function mRemove(id){
+    if (!S.modal) return;
+    S.modal.right = S.modal.right.filter(b => b.id !== id); S.mMsg = null;
+    renderModal();
+  }
+  function mCheck(){
+    if (!S.modal) return;
+    const {r, c, right} = S.modal, left = S.cells[r][c];
+    const L = total(left), Rt = total(right), change = loose(right), changeBars = right.filter(b => b.n < 10).length;
+    let msg = null;
+    if (!right.length) msg = 'Build the new set on the right first.';
+    else if (Rt !== L) msg = S.helpers
+      ? `Both sides must be worth the same. The square has ${L} beads and your set has ${Rt}.`
+      : `Both sides must be worth the same. Your set has ${Rt < L ? 'fewer' : 'more'} beads than the square.`;
+    else if (change >= 10) msg = 'Your change still holds a full ten. Trade it for a golden ten-bar.';
+    else if (changeBars > 1) msg = `Put the change on one bar: ${change} bead${change > 1 ? 's' : ''} is the ${change}-bar.`;
+    if (msg){ S.mMsg = msg; return renderModal(); }
+    S.cells[r][c] = right.map(b => ({id:b.id, n:b.n}));
+    right.forEach(b => fresh.add(b.id));
+    const t = tensOf(right);
+    S.modal = null; S.mMsg = null;
+    setMsg(`Swapped: the ${valueLabel(r-c)} square now holds ${t} golden ten-bar${t > 1 ? 's' : ''}${change ? ` and a ${change}-bar of change` : ' and no change'}.`, 'good');
+    afterExchangeStep();
+  }
+  function fillTray(wrap, bars, removable, newId){
+    wrap.innerHTML = '';
+    if (!bars.length){ if (removable) wrap.innerHTML = '<span class="mempty">Tap bars in the box below (or drag them here) to build an equal set.</span>'; return; }
+    const L = Math.max(...bars.map(b => b.n));
+    const {b, g} = fit(bars.length, L, wrap.clientWidth - 16, wrap.clientHeight - 16, 11);
+    wrap.style.setProperty('--b', b.toFixed(2) + 'px'); wrap.style.setProperty('--g', g.toFixed(2) + 'px');
+    bars.forEach(x => {
+      const el = barEl(x.n);
+      if (removable){ el.dataset.mid = x.id; el.title = 'Tap to put it back'; }
+      wrap.appendChild(el);
+      if (x.id === newId && !reduced) el.animate([{transform:'scale(.3)', opacity:0},{transform:'none', opacity:1}], {duration:260, easing:'cubic-bezier(.3,1.5,.5,1)'});
+    });
+  }
+  function renderModal(newId){
+    const m = $('#modal');
+    const open = !!S.modal && S.mode === 'mul';
+    m.hidden = !open;
+    document.body.classList.toggle('modal-open', open);
+    if (!open) return;
+    const {r, c, right} = S.modal, left = S.cells[r][c], e = r - c;
+    m.querySelector('.modal').style.setProperty('--sq', sqColor(e));
+    $('#mTitle').textContent = `Make tens on the ${valueLabel(e)} square`;
+    fillTray($('#mLeft .mbars'), left, false);
+    fillTray($('#mRight .mbars'), right, true, newId);
+    const cnt = bars => { const t = total(bars), k = tensOf(bars), ch = loose(bars); return S.helpers && t ? `${t} bead${t > 1 ? 's' : ''}${k ? ` · ${k} ten${k > 1 ? 's' : ''} + ${ch} change` : ''}` : ''; };
+    $('#mLeft .mcount').textContent = cnt(left);
+    $('#mRight .mcount').textContent = cnt(right);
+    const mm = $('#mMsg'); mm.hidden = !S.mMsg; mm.textContent = S.mMsg || '';
+  }
+  const mBox = $('#mBox');
+  mBox.innerHTML = boxHTML('mcomp', () => '').replace(/^<div class="beadbox[^"]*">|<\/div>$/g, '');
+  fillDecor(mBox);
+
+  /* ---------------- division actions ---------------- */
+  function shortfall(c){
+    const P = S.prob;
+    for (const m of P.dPlaces){
+      const d = dDig(m); if (!d) continue;
+      const e = P.r0 + m - c, have = S.tray[e];
+      if (have === undefined || have < d) return {e, d, have: have || 0, exists: have !== undefined};
+    }
+    return null;
+  }
+  const cupBowl = e => document.querySelector(`[data-cup="${e}"] .bowl`);
+  function qAdd(c){
+    const P = S.prob;
+    if (S.phase === 'done') return;
+    clearHints();
+    if (S.q[c] >= 9){ setMsg('A quotient card only goes up to 9. Share into the place to its left instead.', 'warn'); return render(); }
+    const s = shortfall(c);
+    if (s){
+      if (!s.exists){
+        setMsg(s.e > trayKeys()[0]
+          ? `There are no ${valueLabel(s.e)} beads in this dividend, so that place is too large. Try a square further right.`
+          : `This dividend has no ${valueLabel(s.e)} beads to share. Try a square further left.`, 'warn');
+      } else {
+        setMsg(`The ${valueLabel(s.e)} cup needs ${s.d} bead${s.d > 1 ? 's' : ''} but has ${s.have}. Break a larger bead into ten, or try a square further right.`, 'warn');
+        S.hintCup = s.e;
+      }
+      return render();
+    }
+    P.dPlaces.forEach(m => {
+      const d = dDig(m); if (!d) return;
+      const R = P.r0 + m, e = R - c;
+      S.tray[e] -= d;
+      fly(cupBowl(e), cellEls[key(R,c)], d, sqColor(e));
+      fresh.add(`d${R}-${c}-${S.q[c]}`);
+    });
+    S.q[c]++;
+    if (trayEmpty()){ S.phase = 'read'; setMsg('All the beads are shared out, none left over. Read the quotient.', 'good'); }
+    else if (S.msg && S.msg.tone === 'warn') setMsg(null);
+    render();
+  }
+  function qSub(c){
+    const P = S.prob;
+    if (!S.q[c] || S.phase === 'done') return;
+    clearHints();
+    P.dPlaces.forEach(m => {
+      const d = dDig(m); if (!d) return;
+      const R = P.r0 + m, e = R - c;
+      S.tray[e] += d;
+      fly(cellEls[key(R,c)], cupBowl(e), d, sqColor(e));
+    });
+    S.q[c]--;
+    if (S.phase === 'read') S.phase = 'distribute';
+    setMsg(null);
+    render();
+  }
+  function brk(e){
+    if (!(S.tray[e] > 0) || S.tray[e-1] === undefined) return;
+    fly(cupBowl(e), cupBowl(e-1), 10, sqColor(e-1));
+    S.tray[e]--; S.tray[e-1] += 10;
+    clearHints(); setMsg(`One ${valueLabel(e)} bead became ten ${valueLabel(e-1)} beads.`);
+    render();
+  }
+  function bundle(e){
+    if (!(S.tray[e] >= 10) || S.tray[e+1] === undefined) return;
+    fly(cupBowl(e), cupBowl(e+1), 10, sqColor(e));
+    S.tray[e] -= 10; S.tray[e+1]++;
+    clearHints(); setMsg(`Ten ${valueLabel(e)} beads became one ${valueLabel(e+1)} bead.`);
+    render();
+  }
+
+  /* ---------------- hints ---------------- */
+  function hint(){
+    clearHints();
+    const P = S.prob;
+    if (S.mode === 'mul'){
+      if (S.phase === 'lay'){
+        const R = curRow(), d = mDig(curM());
+        for (let c=0; c<7; c++){
+          const t = total(S.cells[R][c]), want = target(R,c);
+          if (t === want) continue;
+          S.hintCell = key(R,c);
+          if (!want) setMsg(`The ${valueLabel(R-c)} square in the lit row should be empty. Drag its bars off the board.`);
+          else {
+            const a = aDig(P.r0 - c);
+            setMsg(`This square lines up with the ${a} card: ${d} × ${a}. Lay ${NUMW[d]} ${a}-bar${d > 1 ? 's' : ''} here (${want} beads). It has ${t} now.`);
+          }
+          return render();
+        }
+        setMsg('Every square in the row matches. Press Check this row.', 'good');
+      } else if (GROUPING.includes(S.phase)){
+        for (const [r,c] of laneCells()){
+          const t = loose(S.cells[r][c]);
+          if (t < 10) continue;
+          S.hintCell = key(r,c);
+          setMsg(`The ${valueLabel(r-c)} square has ${t} beads: that is ${NUMW[Math.floor(t/10)]} ten${t >= 20 ? 's' : ''} and ${t % 10} change. Tap Make tens there.`);
+          return render();
+        }
+        setMsg(laneHasTens() ? 'These squares are already tens and change. Press Continue to exchange them.' : 'Nothing to make into tens here. Press Continue.');
+      } else if (EXCHANGING.includes(S.phase)){
+        const a = activeCell();
+        if (a){
+          const [r,c] = a, nx = nextInLane(r,c);
+          S.hintCell = key(r,c);
+          setMsg(loose(S.cells[r][c]) >= 10
+            ? `The ${valueLabel(r-c)} square reached ten again. Make tens there before exchanging.`
+            : `Start with the ${valueLabel(r-c)} square: its golden ten-bar becomes one bead on the ${valueLabel(nx[0]-nx[1])} square. Tap its ← 10 button.`);
+          return render();
+        }
+      } else if (S.phase === 'partial'){
+        const R = curRow();
+        for (let c=0; c<7; c++){
+          const t = total(S.cells[R][c]);
+          if (!t) continue;
+          S.hintCell = key(R,c);
+          setMsg(`Start at the left: the ${valueLabel(R-c)} square has ${t} bead${t > 1 ? 's' : ''}, so the first digit is ${t} in the ${placeWord(R-c)} place. Write 0 for any empty place until you reach the smallest one.`);
+          return render();
+        }
+      } else if (S.phase === 'slide'){
+        for (let r=1; r<7; r++) for (let c=1; c<7; c++) if (S.cells[r][c].length){
+          const [tr] = cellForE(r-c);
+          S.hintCell = key(r,c);
+          setMsg(`These bars are worth ${valueLabel(r-c)} per bead. Drag them down-left along the diagonal to the ${valueLabel(r-c)} square on the ${tr === 0 ? 'bottom row' : 'left column'}.`);
+          return render();
+        }
+      } else if (S.phase === 'read'){
+        for (let e=6; e>=-6; e--){
+          const [r,c] = cellForE(e), t = total(S.cells[r][c]);
+          if (t){
+            S.hintCell = key(r,c);
+            setMsg(`Start with the ${valueLabel(e)} square: ${t} bead${t > 1 ? 's' : ''}, so your first digit is ${t}. Go down to the corner, then along the bottom. The decimal point comes right after the corner (1) square.`);
+            return render();
+          }
+        }
+      }
+      return render();
+    }
+    if (S.phase === 'distribute'){
+      for (let c=0; c<7; c++){
+        if (S.q[c] > qDigAt(c)){ S.hintCell = key(P.r0,c); setMsg(`The ${placeWord(P.r0-c)} card is too high. Take one back with −.`); return render(); }
+      }
+      for (let c=0; c<7; c++){
+        if (S.q[c] >= qDigAt(c)) continue;
+        const s = shortfall(c);
+        if (!s){ S.hintCell = key(P.r0,c); setMsg(`Share into the ${placeWord(P.r0-c)}: tap the ${valueLabel(P.r0-c)} square in the lit row.`); return render(); }
+        let e2 = s.e + 1;
+        while (S.tray[e2] === 0) e2++;
+        if (S.tray[e2] > 0){ S.hintCup = e2; setMsg(`The ${valueLabel(s.e)} cup is short. Break a bead from the ${valueLabel(e2)} cup into ten smaller beads.`); }
+        else if (S.tray[s.e-1] >= 10){ S.hintCup = s.e-1; setMsg(`The ${valueLabel(s.e)} cup is short. Bundle ten ${valueLabel(s.e-1)} beads into one.`); }
+        else setMsg('Take some beads back from the board and share the larger places first.');
+        return render();
+      }
+    } else if (S.phase === 'read'){
+      S.hintCell = key(P.r0, P.r0);
+      setMsg('Read the cards in the lit row from left to right. The card on the green 1 square is the units digit; the decimal point goes right after it.');
+    }
+    render();
+  }
+
+  /* ---------------- answers ---------------- */
+  function checkAnswer(){
+    if (S.phase !== 'read') return;
+    const input = $('#answer'), note = $('#ansNote');
+    const v = parseMicro(input.value);
+    input.classList.remove('bad');
+    if (v === null){ note.className = 'ans-note warn'; note.textContent = 'Type a number, like 4.35.'; return; }
+    if (v === S.prob.answer){
+      S.phase = 'done'; solved++; clearHints();
+      try { localStorage.setItem('decimal-checkerboard-solved', solved); } catch(e){}
+      note.className = 'ans-note good';
+      note.textContent = S.mode === 'mul' ? 'Correct! That is the product.' : 'Correct! That is the quotient.';
+      setMsg(null);
+      render(); celebrate();
+      return;
+    }
+    void input.offsetWidth; input.classList.add('bad');
+    note.className = 'ans-note warn';
+    if (v >= 0 && sigDigits(v) === sigDigits(S.prob.answer))
+      note.textContent = 'The digits are right. Check where the decimal point goes: it sits right after the units digit.';
+    else
+      note.textContent = S.mode === 'mul'
+        ? 'Not quite. Count the beads on each edge square again: the count is the digit, the square gives its place.'
+        : 'Not quite. Read the quotient cards left to right; the one on the green 1 square is the units.';
+  }
+
+  /* ---------------- new problem ---------------- */
+  function newProblem(){
+    S.prob = S.mode === 'mul' ? genMul(S.level, S.decimal) : genDiv(S.level, S.decimal);
+    S.phase = S.mode === 'mul' ? 'lay' : 'distribute';
+    S.mi = 0; S.partials = [];
+    S.cells = emptyCells(); S.q = [0,0,0,0,0,0,0];
+    S.tray = S.mode === 'div' ? initTray(S.prob) : {};
+    S.selected = null; S.wrong = []; clearHints(); setMsg(null); S.modal = null; S.mMsg = null;
+    const input = $('#answer'); input.value = ''; input.classList.remove('bad');
+    $('#ansNote').textContent = ''; $('#ansNote').className = 'ans-note';
+    render();
+  }
+
+  /* ---------------- events ---------------- */
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-action]');
+    if (t && !t.disabled){
+      const a = t.dataset.action;
+      if (a === 'mode'){ if (S.mode !== t.dataset.v){ S.mode = t.dataset.v; newProblem(); } }
+      else if (a === 'level'){ S.level = t.dataset.v; newProblem(); }
+      else if (a === 'new') newProblem();
+      else if (a === 'check-layout') checkLayout();
+      else if (a === 'check-partial') checkPartial();
+      else if (a === 'clear'){ const R = curRow(); for (let c=0; c<7; c++) S.cells[R][c] = []; S.wrong = []; clearHints(); setMsg('Row cleared.'); render(); }
+      else if (a === 'hint') hint();
+      else if (a === 'slide-all') slideAll();
+      else if (a === 'xchg') exchangeTen(Number(t.dataset.r), Number(t.dataset.c));
+      else if (a === 'open-tens') openTens(Number(t.dataset.r), Number(t.dataset.c));
+      else if (a === 'skip-group') skipGroup();
+      else if (a === 'm-check') mCheck();
+      else if (a === 'm-clear'){ if (S.modal){ S.modal.right = []; S.mMsg = null; renderModal(); } }
+      else if (a === 'm-cancel') closeTens();
+      else if (a === 'qminus') qSub(Number(t.dataset.c));
+      else if (a === 'break') brk(Number(t.dataset.e));
+      else if (a === 'bundle') bundle(Number(t.dataset.e));
+      else if (a === 'reset-div'){ S.q = [0,0,0,0,0,0,0]; S.tray = initTray(S.prob); clearHints(); setMsg('The beads are back in the cups.'); render(); }
+      else if (a === 'check-answer') checkAnswer();
+      return;
+    }
+    const mbar = e.target.closest('#mRight .bar[data-mid]');
+    if (mbar){ mRemove(mbar.dataset.mid); return; }
+    if (e.target === $('#modal')){ closeTens(); return; }
+    const comp = e.target.closest('.comp');
+    if (comp && e.detail === 0){ comp.classList.contains('mcomp') ? mAdd(Number(comp.dataset.n)) : toggleSelect(Number(comp.dataset.n)); return; } // keyboard activation
+    if (suppressClick) return;
+    const cell = e.target.closest('.cell');
+    if (!cell) return;
+    const r = Number(cell.dataset.r), c = Number(cell.dataset.c);
+    if (S.mode === 'div' && r === S.prob.r0) qAdd(c);
+    else if (canOpenTens(r,c)) openTens(r,c);
+    else if (S.selected && canBox()) addBar(r, c, S.selected);
+  });
+  board.addEventListener('keydown', e => {
+    const cell = e.target.closest('.cell');
+    if (!cell || !(e.key === 'Enter' || e.key === ' ')) return;
+    const r = Number(cell.dataset.r), c = Number(cell.dataset.c);
+    if (S.mode === 'div' && r === S.prob.r0){ e.preventDefault(); qAdd(c); }
+    else if (S.selected && canBox()){ e.preventDefault(); addBar(r, c, S.selected); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && S.modal){ closeTens(); return; }
+    if (e.key === 'Escape' && S.selected){ S.selected = null; render(); }
+    if (e.key === 'Enter' && e.target.id === 'partial') checkPartial();
+    if (e.key === 'Enter' && e.target.id === 'answer') checkAnswer();
+  });
+  $('#helpers').addEventListener('change', e => { S.helpers = e.target.checked; render(); });
+  $('#decimalOpt').addEventListener('change', e => { S.decimal = e.target.checked; newProblem(); });
+
+  function toggleSelect(n){
+    if (!canBox()) return;
+    S.selected = S.selected === n ? null : n;
+    render();
+  }
+
+  board.addEventListener('pointerover', e => {
+    const cell = e.target.closest('.cell');
+    const r = cell ? Number(cell.dataset.r) : -1;
+    for (let i=0; i<7; i++) tileR[i].firstElementChild?.classList.toggle('hl', i === r);
+  });
+  board.addEventListener('pointerleave', () => board.querySelectorAll('.tile.hl').forEach(t => t.classList.remove('hl')));
+
+  /* drag and drop */
+  let D = null, suppressClick = false, hoverCell = null;
+  document.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const mcomp = e.target.closest('.mcomp');
+    if (mcomp){ D = {kind:'mbox', n:Number(mcomp.dataset.n), x:e.clientX, y:e.clientY, started:false}; return; }
+    const comp = e.target.closest('.comp');
+    if (comp && !comp.disabled){ D = {kind:'box', n:Number(comp.dataset.n), x:e.clientX, y:e.clientY, started:false}; return; }
+    const bar = e.target.closest('.cell .bar[data-draggable]');
+    if (bar){
+      const cell = bar.closest('.cell');
+      D = {kind:'cell', id:bar.dataset.id, n:Number(bar.dataset.n), r:Number(cell.dataset.r), c:Number(cell.dataset.c), x:e.clientX, y:e.clientY, started:false, el:bar};
+    }
+  });
+  function dropOk(cell){
+    const r = Number(cell.dataset.r), c = Number(cell.dataset.c);
+    if (S.phase === 'lay') return r === curRow();
+    if (S.phase === 'slide') return D.kind === 'cell' && r - c === D.r - D.c;
+    if (EXCHANGING.includes(S.phase) && D.kind === 'cell'){ const nx = nextInLane(D.r, D.c); return !!nx && nx[0] === r && nx[1] === c; }
+    return false;
+  }
+  function startDrag(){
+    D.started = true;
+    const g = barEl(D.n);
+    g.classList.add('ghost');
+    g.style.setProperty('--b', Math.max(6, Math.min(9, cellEls['0,0'].clientWidth / 10)) + 'px');
+    document.body.appendChild(g);
+    D.ghost = g; D.gw = g.offsetWidth; D.gh = g.offsetHeight;
+    if (D.kind === 'cell'){
+      D.el.classList.add('lifted');
+      if (S.phase === 'slide') for (let r=0; r<7; r++) for (let c=0; c<7; c++) if (r-c === D.r-D.c) cellEls[key(r,c)].classList.add('diag');
+    }
+    document.body.classList.add('dragging');
+  }
+  function clearHover(){ if (hoverCell){ hoverCell.classList.remove('drop-ok','drop-no'); hoverCell = null; } }
+  document.addEventListener('pointermove', e => {
+    if (!D) return;
+    if (!D.started){
+      if (Math.hypot(e.clientX - D.x, e.clientY - D.y) < 6) return;
+      startDrag();
+    }
+    e.preventDefault();
+    D.ghost.style.transform = `translate(${e.clientX - D.gw/2}px, ${e.clientY - D.gh/2}px) rotate(-10deg)`;
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    if (D.kind === 'mbox'){ $('#mRight .mbars').classList.toggle('drop-ok', !!under?.closest('#mRight')); return; }
+    const cell = under?.closest('.cell');
+    if (cell !== hoverCell){
+      clearHover();
+      if (cell){ cell.classList.add(dropOk(cell) ? 'drop-ok' : 'drop-no'); hoverCell = cell; }
+    }
+  }, {passive:false});
+  function endDrag(e){
+    const d = D;
+    if (!d) return;
+    if (!d.started){ D = null; if (d.kind === 'box' && e) toggleSelect(d.n); if (d.kind === 'mbox' && e) mAdd(d.n); return; }
+    suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
+    d.ghost.remove();
+    document.body.classList.remove('dragging');
+    board.querySelectorAll('.cell.diag').forEach(c => c.classList.remove('diag'));
+    clearHover();
+    const cell = e ? document.elementFromPoint(e.clientX, e.clientY)?.closest('.cell') : null;
+    const ok = cell ? dropOk(cell) : false;
+    D = null;
+    if (d.kind === 'mbox'){
+      $('#mRight .mbars').classList.remove('drop-ok');
+      if (e && document.elementFromPoint(e.clientX, e.clientY)?.closest('#mRight')) mAdd(d.n);
+      return;
+    }
+    if (!e){ render(); return; }
+    if (d.kind === 'box'){
+      if (cell) addBar(Number(cell.dataset.r), Number(cell.dataset.c), d.n);
+      return;
+    }
+    if (cell){
+      const r2 = Number(cell.dataset.r), c2 = Number(cell.dataset.c);
+      if (r2 === d.r && c2 === d.c){ render(); return; }
+      if (!ok){
+        if (EXCHANGING.includes(S.phase)) setMsg('A golden ten-bar becomes one bead on the next larger square: the one to its left (or above, on the left column).', 'warn');
+        else if (S.phase === 'slide') setMsg('Beads only slide along their own diagonal, where every square has the same value.', 'warn');
+        else setMsg(`These bars belong to the ${mDig(curM())} card, so keep them in the lit row.`, 'warn');
+        render(); return;
+      }
+      if (EXCHANGING.includes(S.phase)) exchangeTen(d.r, d.c);
+      else moveBar(d.id, r2, c2);
+    } else if (S.phase === 'lay') removeBar(d.id);
+    else { setMsg('Keep the beads on the board. Slide them along their diagonal.', 'warn'); render(); }
+  }
+  document.addEventListener('pointerup', endDrag);
+  document.addEventListener('pointercancel', () => endDrag(null));
+
+  let raf = 0;
+  new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => S.prob && renderCells()); }).observe(board);
+
+  /* bead stair logo */
+  const stair = $('#stair');
+  for (let n=1; n<=9; n++) stair.appendChild(barEl(n));
+
+  /* ---------------- boot ---------------- */
+  function start(data){
+    const saved = data && data.state;
+    if (saved && saved.prob && saved.prob.r0 !== undefined) Object.assign(S, saved);
+    buildBoard();
+    if (!S.prob || S.prob.r0 === undefined) newProblem(); else render();
+  }
+  try { window.claude?.hot?.snapshot?.(() => ({state: JSON.parse(JSON.stringify(S))})); } catch(e){}
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body></html>
