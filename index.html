@@ -144,9 +144,9 @@ body.armed .cell.active-row{cursor:copy}
   font:800 max(9px, calc(var(--cell)*.16))/1 "Alegreya Sans",sans-serif; padding:.4em .5em; border-radius:999px;
   background:linear-gradient(#fffaf0,#f0ddb8); color:#3b2a19; box-shadow:0 2px 0 #b98652, 0 4px 8px rgba(0,0,0,.4);
   animation:bob 1.8s ease-in-out infinite}
-/* hovering a square fades its card and count so every bead can be counted */
-.card, .count{transition:opacity .4s cubic-bezier(.4,0,.2,1)}
-.cell:hover .card, .cell:focus-visible .card, .cell:hover .count, .cell:focus-visible .count{opacity:.1}
+/* hovering a square fades its count so every bead can be counted */
+.count{transition:opacity .4s cubic-bezier(.4,0,.2,1)}
+.cell:hover .count, .cell:focus-visible .count{opacity:.1}
 .cell.wrong{box-shadow:inset 0 0 0 3px #fff, inset 0 0 0 5px #1d1a16; animation:shake .4s}
 .cell.hint{animation:glow 1.1s ease-in-out 3}
 .cell.drop-ok{box-shadow:inset 0 0 0 3px rgba(255,255,255,.95), inset 0 0 18px rgba(255,255,255,.5)}
@@ -294,8 +294,8 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none!important; transition:none!important}
-  /* a fade moves nothing, so the hover fade on cards and counts stays */
-  .card, .count{transition:opacity .4s cubic-bezier(.4,0,.2,1)!important}
+  /* a fade moves nothing, so the hover fade on counts stays */
+  .count{transition:opacity .4s cubic-bezier(.4,0,.2,1)!important}
 }
 </style>
 
@@ -630,7 +630,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
       }
       const count = tot && S.helpers
         ? `<span class="count ${loose(bars) >= 10 && S.phase !== 'lay' ? 'big' : ''}">${tot}</span>` : '';
-      // the card and count slide aside on hover (CSS), so beads use the full square;
+      // the count fades on hover (CSS), so beads use the full square;
       // only a step button, which has to stay clickable, gets its own strip at the bottom
       // the multiplicand cards straddle the line under their row, so keep beads clear of them
       let top = r === P.r0 - 1 && aDig(P.r0 - c) !== undefined ? cardH/2 + 3 : 3;
