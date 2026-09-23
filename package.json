@@ -1,7 +1,7 @@
 {
   "name": "montessori-checkerboard-math",
   "private": true,
-  "description": "Montessori decimal checkerboard: multiply and divide decimals with bead bars.",
+  "description": "Montessori decimal checkerboard: multiply by a decimal with bead bars.",
   "scripts": {
     "build": "node scripts/build.mjs",
     "start": "node server.js"

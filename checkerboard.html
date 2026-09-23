@@ -121,18 +121,18 @@ body.armed .cell.active-row{cursor:copy}
 .cell .target{position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; z-index:0;
   font:italic 700 max(10px, calc(var(--cell)*.22))/1 "Alegreya",serif; color:rgba(255,255,255,.88); text-shadow:0 1px 2px rgba(0,0,0,.5); transition:opacity .3s}
 .cell .target.met{opacity:0}
-.card{position:absolute; left:3px; top:3px; z-index:3; min-width:max(16px, calc(var(--cell)*.3)); height:max(16px, calc(var(--cell)*.3)); padding:0 2px; display:grid; place-items:center; border-radius:4px; pointer-events:none;
-  background-image:var(--grain),linear-gradient(#fbf1dd,#ecd3a9); background-blend-mode:multiply,normal;
-  color:var(--wood-ink); font:800 max(11px, calc(var(--cell)*.21))/1 "Alegreya",serif; font-variant-numeric:lining-nums;
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 2px 0 #a97b4b, 0 3px 5px rgba(0,0,0,.35); animation:drop .3s cubic-bezier(.3,1.4,.5,1) backwards}
-.qplus{position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; z-index:0;
-  font:700 calc(var(--cell)*.36)/1 "Alegreya Sans",sans-serif; color:rgba(255,255,255,.75); text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.qminus{position:absolute; top:3px; right:3px; z-index:4; width:max(18px, calc(var(--cell)*.3)); height:max(18px, calc(var(--cell)*.3)); border-radius:50%; border:0; padding:0; cursor:pointer;
-  font:800 max(12px, calc(var(--cell)*.2))/1 "Alegreya Sans",sans-serif; background:#1d1a16; color:#f4efe4; box-shadow:0 2px 4px rgba(0,0,0,.35)}
+/* white multiplicand cards lie below their row, on the line between squares */
+.card{position:absolute; left:50%; bottom:0; transform:translate(-50%,50%); z-index:3; min-width:max(18px, calc(var(--cell)*.34)); height:max(18px, calc(var(--cell)*.34)); padding:0 2px; display:grid; place-items:center; border-radius:3px; pointer-events:none;
+  background:linear-gradient(#ffffff,#eeebe4); color:#2a241d; font:800 max(12px, calc(var(--cell)*.23))/1 "Alegreya",serif; font-variant-numeric:lining-nums;
+  box-shadow:0 0 0 1px rgba(0,0,0,.12), 0 2px 0 #b9b2a5, 0 3px 5px rgba(0,0,0,.35); animation:drop .3s cubic-bezier(.3,1.4,.5,1) backwards}
+/* black disk for the decimal point */
+.dpt{position:absolute; z-index:4; width:max(7px, calc(var(--cell)*.12)); height:max(7px, calc(var(--cell)*.12)); border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle at 35% 30%, #555 0, #111 60%); box-shadow:0 1px 2px rgba(0,0,0,.45)}
+.cell .dpt{left:0; bottom:0; transform:translate(-50%,50%)}
+.tslot .dpt{left:50%; top:0; transform:translate(-50%,-50%)}
 .count{position:absolute; right:3px; top:3px; z-index:2; min-width:1.5em; padding:0 .3em; border-radius:999px; pointer-events:none;
   background:rgba(255,252,244,.93); color:#2a241d; text-align:center; font:800 max(9px, calc(var(--cell)*.16))/1.4 "Alegreya Sans",sans-serif; font-variant-numeric:tabular-nums; box-shadow:0 1px 2px rgba(0,0,0,.35)}
 .count.big{background:#ffe7a3}
-.count.shift{right:calc(max(18px, var(--cell)*.3) + 6px)}
 .xchg{position:absolute; left:3px; bottom:3px; z-index:4; border:0; cursor:pointer; white-space:nowrap;
   font:800 max(9px, calc(var(--cell)*.16))/1 "Alegreya Sans",sans-serif; padding:.4em .5em; border-radius:999px;
   background:linear-gradient(#fffaf0,#f0ddb8); color:#3b2a19; box-shadow:0 2px 0 #b98652, 0 4px 8px rgba(0,0,0,.4);
@@ -149,16 +149,15 @@ body.armed .cell.active-row{cursor:copy}
 
 .tslot{position:relative; display:grid; place-items:center}
 .tile{width:calc(var(--cell)*.6); height:calc(var(--cell)*.6); display:grid; place-items:center; border-radius:6px;
-  background-image:var(--grain),linear-gradient(#f8e9cd,#e6c99b); background-blend-mode:multiply,normal;
-  color:var(--wood-ink); font:800 calc(var(--cell)*.38)/1 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums;
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 3px 0 #a97b4b, 0 7px 10px -5px rgba(0,0,0,.45);
+  background:linear-gradient(#dcdbd7,#b8b6b0);
+  color:#1d1a16; font:800 calc(var(--cell)*.38)/1 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums;
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 3px 0 #7f7c75, 0 7px 10px -5px rgba(0,0,0,.45);
   transition:transform .3s, box-shadow .2s, color .2s; animation:drop .35s cubic-bezier(.3,1.4,.5,1) both}
-.tile.current{box-shadow:0 0 0 3px var(--accent), 0 3px 0 #a97b4b, 0 10px 14px -6px rgba(0,0,0,.5); transform:translateX(-3px)}
+.tile.current{box-shadow:0 0 0 3px var(--accent), 0 3px 0 #7f7c75, 0 10px 14px -6px rgba(0,0,0,.5); transform:translateX(-3px)}
 .tile{position:relative}
-.tile.turned{color:rgba(59,42,25,.34); background-image:var(--grain),linear-gradient(#e3c89f,#cdab7b); box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 2px 0 #a97b4b}
-.tile.turned::after{content:"✓"; position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; display:grid; place-items:center;
-  font:800 11px/1 "Alegreya Sans",sans-serif; color:#fff; background:#3e8a3a; box-shadow:0 1px 3px rgba(0,0,0,.35)}
-.tile.hl{box-shadow:0 0 0 2px var(--accent), 0 3px 0 #a97b4b, 0 10px 14px -6px rgba(0,0,0,.5)}
+/* turned face down: only the card being multiplied by shows its digit */
+.tile.down{color:transparent; background:repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 3px, transparent 3px 7px), linear-gradient(#8e8c86,#6f6d68); box-shadow:0 1px 0 rgba(255,255,255,.2) inset, 0 2px 0 #55534f}
+.tile.hl{box-shadow:0 0 0 2px var(--accent), 0 3px 0 #7f7c75, 0 10px 14px -6px rgba(0,0,0,.5)}
 
 /* ---------- beads ---------- */
 .bead{display:block; flex:none; width:var(--b); height:var(--b); border-radius:50%;
@@ -203,11 +202,12 @@ body.armed .cell.active-row{cursor:copy}
 .paper{margin-top:14px; padding:12px 16px 14px; border-radius:3px; color:#2a2520; transform:rotate(-.6deg);
   background:repeating-linear-gradient(transparent 0 25px, #cfdcec 25px 26px) 0 12px / 100% 26px, #fbf8f1;
   box-shadow:0 1px 2px rgba(0,0,0,.25), 0 10px 18px -12px rgba(0,0,0,.5);
-  display:grid; grid-template-columns:1.2em max-content max-content 1fr; column-gap:0; row-gap:0; align-items:end;
+  display:grid; grid-template-columns:1.2em repeat(var(--n),.62em) 1fr; column-gap:0; row-gap:0; align-items:end;
   font:600 18px/26px "Alegreya",Georgia,serif; font-variant-numeric:lining-nums tabular-nums}
-.paper .pt{grid-column:1/-1; font:italic 500 13px/26px "Alegreya Sans",sans-serif; color:#7a6f60}
+.paper .ptitle{grid-column:1/-1; font:italic 500 13px/26px "Alegreya Sans",sans-serif; color:#7a6f60}
 .paper .op{color:#7a6f60}
-.paper .w{text-align:right}
+.paper .d{height:26px; text-align:center; position:relative}
+.paper .d.dp::after{content:"."; position:absolute; right:0; transform:translateX(50%)}
 .paper .nt{padding-left:12px; font:italic 500 13px/26px "Alegreya Sans",sans-serif; color:#7a6f60}
 .paper .u{box-shadow:inset 0 -2px 0 #2a2520}
 .paper .tot{color:#1f4c9b; font-weight:800}
@@ -258,20 +258,6 @@ body.modal-open{overflow:hidden}
 .comp[aria-pressed="true"] .bar:first-of-type{transform:translateY(-4px) rotate(-6deg)}
 .decor{display:flex; align-items:flex-end; justify-content:center; gap:max(2px, calc(var(--b)*.45)); max-width:100%; overflow:hidden}
 
-/* cups */
-.cups{display:flex; flex-direction:column; gap:8px}
-.cup{display:grid; grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:"lab bowl n" "act act act"; gap:6px 10px; align-items:center; padding:8px 10px; border-radius:12px; background:var(--pad-2)}
-.cup.hint{box-shadow:0 0 0 3px #e8b23a}
-.cup-lab{grid-area:lab; min-width:64px; text-align:center; padding:4px 8px; border-radius:6px; font:italic 700 14px/1.2 "Alegreya Sans",sans-serif; font-variant-numeric:tabular-nums;
-  background-color:var(--sq); background-image:var(--fuzz); background-blend-mode:soft-light; color:var(--sqi)}
-.bowl{grid-area:bowl; min-height:28px; border-radius:999px; padding:5px 10px; box-shadow:inset 0 2px 6px rgba(0,0,0,.35); background:rgba(0,0,0,.07)}
-.loose{display:flex; flex-wrap:wrap; gap:2px; align-items:center; --b:9px}
-.loose em{font-style:normal; font-weight:700; font-size:13px; color:var(--ink-soft); margin-left:3px}
-.cup-n{grid-area:n; font:800 20px/1 "Alegreya",serif; font-variant-numeric:tabular-nums; min-width:2ch; text-align:right}
-.cup-act{grid-area:act; display:flex; gap:6px; justify-content:flex-end}
-.mini{appearance:none; border:0; border-radius:999px; padding:6px 10px; font:700 13px/1 "Alegreya Sans",sans-serif; cursor:pointer; background:var(--chip); color:var(--ink); box-shadow:0 2px 0 rgba(0,0,0,.18)}
-.mini:disabled{opacity:.4; cursor:not-allowed}
-
 /* answer */
 .ansrow{display:flex; gap:8px; margin-top:6px}
 .ansrow input, .partial-row input{flex:1; min-width:0; font:700 22px/1.2 "Alegreya",Georgia,serif; font-variant-numeric:lining-nums tabular-nums; padding:8px 12px; border-radius:10px; border:2px solid var(--stitch); background:var(--chip); color:var(--ink)}
@@ -312,20 +298,16 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
       <div class="stair" id="stair" aria-hidden="true"></div>
       <div>
         <h1>Decimal Checkerboard</h1>
-        <p>Multiply and divide decimals with bead bars, the Montessori way.</p>
+        <p>Multiply by a decimal with bead bars, the Montessori way.</p>
       </div>
     </div>
     <div class="controls">
-      <div class="seg" role="group" aria-label="Operation">
-        <button type="button" data-action="mode" data-v="mul" id="modeMul">× Multiply</button>
-        <button type="button" data-action="mode" data-v="div" id="modeDiv">÷ Divide</button>
-      </div>
       <div class="seg" role="group" aria-label="Level">
         <button type="button" data-action="level" data-v="easy" id="lvEasy">Easy</button>
         <button type="button" data-action="level" data-v="medium" id="lvMedium">Medium</button>
         <button type="button" data-action="level" data-v="hard" id="lvHard">Hard</button>
       </div>
-      <label class="toggle" for="decimalOpt"><input type="checkbox" id="decimalOpt"><span class="knob"></span><span id="decLab">Decimal × decimal</span></label>
+      <label class="toggle" for="decimalOpt"><input type="checkbox" id="decimalOpt"><span class="knob"></span><span>Decimal multiplier</span></label>
       <label class="toggle" for="helpers"><input type="checkbox" id="helpers"><span class="knob"></span>Helper numbers</label>
       <button type="button" class="btn primary" data-action="new">New problem</button>
     </div>
@@ -392,7 +374,6 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   const placeWord = m => PLACE[m];
 
   const sqColor = e => e >= 0 ? WHOLE_SQ[e % 3] : DEC_SQ[(-e) % 3];
-  const sqInk = e => e >= 0 ? '#fff' : '#1d1a16';
   function valueLabel(e){
     if (e >= 0) return Math.pow(10,e).toLocaleString('en-US');
     return '0.' + '0'.repeat(-e-1) + '1';
@@ -421,77 +402,45 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   }
 
   /* ---------------- problem generation ----------------
-     Layout follows the Montessori album (MRD Decimals Manual, 8C):
-     multiplicand cards lie ON the board, lowest digit on its square nearest the right edge;
-     multiplier cards go on the right edge, units card level with the multiplicand. */
+     Layout follows the album (Multiplication with Decimals by a Fraction, decimal checkerboard):
+     white multiplicand cards lie below their row, smallest digit touching the right edge of the
+     board, a 0 card for missing units and a black disk for the decimal point; gray multiplier
+     cards go on the right edge, units card level with that row, so units × units lands on a units square. */
   function genMul(level, dec){
     for (let t=0; t<500; t++){
       let nA, p, nM, k = 0;
       if (!dec){
-        if (level === 'easy'){ nA = ri(2,3); p = nA-1; nM = 1; }
-        else if (level === 'medium'){ nA = ri(3,4); p = ri(Math.max(1,nA-2), nA-1); nM = 2; }
-        else { nA = ri(4,5); p = ri(2, nA-1); nM = 3; }
+        if (level === 'easy'){ nA = ri(2,3); p = Math.random() < .3 ? nA : nA-1; nM = 1; }
+        else if (level === 'medium'){ nA = ri(3,4); p = ri(Math.max(1,nA-2), nA); nM = 2; }
+        else { nA = ri(4,5); p = ri(2, nA); nM = 3; }
       } else {
         if (level === 'easy'){ nA = ri(2,3); p = nA-1; nM = 1; k = 1; }
         else if (level === 'medium'){ if (Math.random() < .25){ nA = 3; p = 0; nM = 2; k = 2; } else { nA = 3; p = 2; nM = 2; k = ri(1,2); } }
-        else { nA = ri(3,4); p = ri(1, nA-1); nM = ri(2,3); k = ri(1,2); }
+        else { nA = ri(3,4); p = ri(1, nA); nM = ri(2,3); k = ri(1,2); }
       }
-      const mTop = nM - 1 - k;
-      // album limits: multiplier no longer than multiplicand; everything must stay on the board
-      const nCards = Math.max(mTop,0) + k + 1; // includes a leading 0 units card, e.g. 0.25 → 0 2 5
-      if (nCards > nA || mTop > p || p + k > 6 || nA > 6) continue;
+      const mTop = nM - 1 - k, aTop = Math.max(nA - 1 - p, 0);
+      // album limits: multiplier no longer than multiplicand; everything must stay on the board.
+      // Card counts include a leading 0 units card, e.g. 0.25 → 0 2 5
+      const nCards = Math.max(mTop,0) + k + 1, aCards = aTop + p + 1;
+      if (nCards > aCards || mTop > p || p + k > 6 || aTop > 6 - p) continue;
       const aInt = digits(nA, level === 'easy');
       let mInt = digits(nM, level === 'easy');
       if (nM === 1 && k === 0 && mInt === 1) mInt = ri(2,9);
-      const aPlaces = []; for (let j=nA-1-p; j>=-p; j--) aPlaces.push(j);
+      const aPlaces = []; for (let j=aTop; j>=-p; j--) aPlaces.push(j);
       const mPlaces = []; for (let m=Math.max(mTop,0); m>=-k; m--) mPlaces.push(m);
       const seq = mPlaces.filter(m => digitAt(mInt,k,m) > 0).sort((a,b) => a-b);
       return {type:'mul', aInt, p, mInt, k, r0: 6-p, aPlaces, mPlaces, seq,
         Astr: fmtFixed(aInt,p), Mstr: fmtFixed(mInt,k), answer: aInt*mInt*Math.pow(10, 6-p-k)};
     }
   }
-  /* Division mirrors that layout: divisor on the right edge, quotient cards built on the board
-     in the row of the divisor's units card, dividend in cups. */
-  function genDiv(level, dec){
-    const nz = (lo,hi) => { let d; do { d = ri(lo,hi); } while (d % 10 === 0); return d; };
-    for (let t=0; t<500; t++){
-      let DInt, k = 0, qd, qWhole = 1;
-      if (!dec){
-        if (level === 'easy'){ DInt = ri(2,9); qd = 1; }
-        else if (level === 'medium'){ if (Math.random() < .6){ DInt = ri(2,9); qd = 2; } else { DInt = nz(11,19); qd = 1; } }
-        else { DInt = nz(12,49); qd = ri(2,3); }
-      } else {
-        if (level === 'easy'){ DInt = ri(2,9); k = 1; qd = 1; }
-        else if (level === 'medium'){ DInt = nz(12,48); k = 1; qd = ri(1,2); }
-        else { DInt = nz(12,49); k = ri(1,2); qd = 2; }
-        if (Math.random() < .4) qWhole = 2;
-      }
-      // The divisor's last card goes on the bottom row, so its units card (the quotient row)
-      // is known from the divisor alone, never from the answer.
-      const dTop = String(DInt).length - 1 - k, r0 = k, qTop = qWhole - 1;
-      if (r0 + dTop > 6 || r0 + qd > 6 || qTop > r0) continue;
-      const qInt = digits(qWhole + qd, level === 'easy');
-      const dPlaces = []; for (let m=Math.max(dTop,0); m>=-k; m--) dPlaces.push(m);
-      const dvInt = qInt * DInt, dvDec = qd + k;
-      return {type:'div', DInt, k, r0, qInt, qd, qTop, dPlaces, dvInt, dvDec,
-        Dstr: fmtFixed(DInt,k), dividendStr: trimZeros(fmtFixed(dvInt,dvDec)), qStr: fmtFixed(qInt,qd),
-        answer: qInt*Math.pow(10, 6-qd)};
-    }
-  }
-  function initTray(P){
-    const t = {}, s = String(P.dvInt);
-    for (let i=0; i<s.length; i++) t[i - P.dvDec] = Number(s[s.length-1-i]);
-    return t;
-  }
-
   /* ---------------- state ---------------- */
   const emptyCells = () => Array.from({length:7}, () => Array.from({length:7}, () => []));
   const S = {
-    mode:'mul', level:'easy', helpers:false, decimal:false,
+    level:'easy', helpers:false, decimal:false,
     prob:null, phase:'lay', mi:0, partials:[],
-    cells:emptyCells(), q:[0,0,0,0,0,0,0], tray:{},
+    cells:emptyCells(),
     selected:null, wrong:[], msg:null, seq:1,
-    hintCell:null, hintCup:null, modal:null, mMsg:null
+    hintCell:null, modal:null, mMsg:null
   };
   const fresh = new Set();
   let solved = 0;
@@ -505,26 +454,14 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   const GROUPING = ['group','fgroup'], EXCHANGING = ['rowx','exchange'];
   const aDig = j => S.prob.aPlaces.includes(j) ? digitAt(S.prob.aInt, S.prob.p, j) : undefined;
   const mDig = m => S.prob.mPlaces.includes(m) ? digitAt(S.prob.mInt, S.prob.k, m) : undefined;
-  const dDig = m => S.prob.dPlaces.includes(m) ? digitAt(S.prob.DInt, S.prob.k, m) : undefined;
   const curM = () => S.prob.seq[S.mi];
   const curRow = () => S.prob.r0 + curM();
-  function qDigAt(c){
-    const P = S.prob, j = P.r0 - c;
-    return (j > P.qTop || j < -P.qd) ? 0 : digitAt(P.qInt, P.qd, j);
-  }
   function target(r,c){
     const a = aDig(S.prob.r0 - c), d = mDig(curM());
     return (a && d) ? a*d : 0;
   }
-  function cellBars(r,c){
-    if (S.mode === 'mul') return S.cells[r][c];
-    const d = dDig(r - S.prob.r0), n = S.q[c];
-    if (!d || !n) return [];
-    return Array.from({length:n}, (_,i) => ({id:`d${r}-${c}-${i}`, n:d}));
-  }
-  const canBox = () => S.mode === 'mul' && S.phase === 'lay';
-  const trayKeys = () => Object.keys(S.tray).map(Number).sort((a,b) => b-a);
-  const trayEmpty = () => Object.values(S.tray).every(v => v === 0);
+  const cellBars = (r,c) => S.cells[r][c];
+  const canBox = () => S.phase === 'lay';
   function rowValue(R){
     let v = 0;
     for (let c=0; c<7; c++) v += total(S.cells[R][c]) * Math.pow(10, R - c + 6);
@@ -554,7 +491,13 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
     return null;
   }
   function setMsg(text, tone=''){ S.msg = text ? {text, tone} : null; }
-  function clearHints(){ S.hintCell = S.hintCup = null; }
+  function clearHints(){ S.hintCell = null; }
+  // estimate out loud first: round each factor to one significant digit
+  function estimate(){
+    const P = S.prob, r1 = x => { const f = Math.pow(10, Math.floor(Math.log10(x))); return Math.round(x/f)*f; };
+    const a = r1(P.aInt / Math.pow(10,P.p)), m = r1(P.mInt / Math.pow(10,P.k)), f = v => trimZeros(v.toFixed(6));
+    return {a:f(a), m:f(m), v:f(a*m)};
+  }
 
   /* ---------------- board construction ---------------- */
   const board = $('#board');
@@ -629,73 +572,63 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   }
   function renderTiles(){
     const P = S.prob;
-    tileHead.textContent = P.type === 'mul' ? '×' : '÷';
+    tileHead.textContent = '×';
     const multiplying = MULTIPLYING.includes(S.phase);
     for (let r=0; r<7; r++){
-      const m = r - P.r0;
-      if (P.type === 'mul'){
-        const d = mDig(m);
-        if (d === undefined){ tileR[r].innerHTML = ''; continue; }
-        const cur = multiplying && m === curM();
-        const turned = (multiplying && m < curM()) || ['slide','fgroup','exchange','read'].includes(S.phase);
-        tileR[r].innerHTML = `<div class="tile ${cur ? 'current' : ''} ${turned ? 'turned' : ''}" title="Multiplier card: ${d} ${placeWord(m)}${turned ? ' (done; the album turns it over)' : ''}">${d}</div>`;
-      } else {
-        const d = dDig(m);
-        tileR[r].innerHTML = d === undefined ? '' : `<div class="tile" title="Divisor card: ${d} ${placeWord(m)}">${d}</div>`;
-      }
+      const m = r - P.r0, d = mDig(m);
+      if (d === undefined){ tileR[r].innerHTML = ''; continue; }
+      // while multiplying, every card but the current one is turned face down
+      const cur = multiplying && m === curM(), down = multiplying && !cur;
+      // black disk between the units card and the tenths card
+      const dot = m === -1 ? '<span class="dpt" aria-hidden="true"></span>' : '';
+      tileR[r].innerHTML = dot + `<div class="tile ${cur ? 'current' : ''} ${down ? 'down' : ''}" title="Multiplier card: ${down ? 'turned face down' : d + ' ' + placeWord(m)}">${d}</div>`;
     }
   }
   function renderCells(){
     const prev = captureRects();
     const cs = cellEls['0,0'].clientWidth;
-    // overlay sizes, mirroring the CSS for .card, .count, .qminus and .xchg
-    const chipH = Math.max(9, cs*.16)*1.8;
-    const P = S.prob, isMul = S.mode === 'mul';
-    const multiplying = isMul && MULTIPLYING.includes(S.phase);
+    // overlay sizes, mirroring the CSS for .card, .count and .xchg
+    const chipH = Math.max(9, cs*.16)*1.8, cardH = Math.max(18, cs*.34);
+    const P = S.prob;
+    const multiplying = MULTIPLYING.includes(S.phase);
     const R = multiplying ? curRow() : -1;
     board.classList.toggle('focus-row', multiplying);
-    const act = isMul && EXCHANGING.includes(S.phase) ? activeCell() : null;
+    const act = EXCHANGING.includes(S.phase) ? activeCell() : null;
     for (let r=0; r<7; r++) for (let c=0; c<7; c++){
       const el = cellEls[key(r,c)];
       const bars = cellBars(r,c);
       const tot = total(bars);
       const tgtEl = el.querySelector('.target');
       let tgt = '';
-      if (isMul && S.phase === 'lay' && S.helpers && r === R){
+      if (S.phase === 'lay' && S.helpers && r === R){
         const a = aDig(P.r0 - c), d = mDig(curM());
         if (a) tgt = `${d}×${a}`;
       }
       tgtEl.textContent = tgt;
       tgtEl.classList.toggle('met', !!tgt && tot === target(r,c));
-      const draggable = (S.phase === 'lay' && r === R) || (isMul && S.phase === 'slide');
-      // overlays: cards lying on the board (multiplicand ×, quotient ÷), the count, the step button
-      let card = '', minus = '', plus = '', chip = '';
+      const draggable = (S.phase === 'lay' && r === R) || (S.phase === 'slide');
+      // overlays: multiplicand cards below their row (with the decimal-point disk), the count, the step button
+      let card = '', chip = '';
       if (r === P.r0){
-        if (isMul){
-          const a = aDig(P.r0 - c);
-          if (a !== undefined) card = `<span class="card" title="Multiplicand card: ${a} ${placeWord(P.r0-c)}">${a}</span>`;
-        } else {
-          const n = S.q[c], done = S.phase === 'done';
-          if (n){
-            card = `<span class="card">${n}</span>`;
-            if (!done) minus = `<button type="button" class="qminus" data-action="qminus" data-c="${c}" aria-label="Take one back from the ${placeWord(P.r0-c)} of the quotient">−</button>`;
-          } else if (!done) plus = '<span class="qplus" aria-hidden="true">+</span>';
-        }
+        const a = aDig(P.r0 - c);
+        if (a !== undefined) card = `<span class="card" title="Multiplicand card: ${a} ${placeWord(P.r0-c)}">${a}</span>`;
+        if (P.p > 0 && c === P.r0 + 1) card += '<span class="dpt" aria-hidden="true"></span>';
       }
       const makeTens = `<button type="button" class="xchg" data-action="open-tens" data-r="${r}" data-c="${c}">Make tens</button>`;
-      if (isMul && GROUPING.includes(S.phase) && loose(bars) >= 10 && inLane(r,c)) chip = makeTens;
+      if (GROUPING.includes(S.phase) && loose(bars) >= 10 && inLane(r,c)) chip = makeTens;
       if (act && act[0] === r && act[1] === c){
         const nx = nextInLane(r,c);
         chip = loose(bars) >= 10 ? makeTens
           : `<button type="button" class="xchg" data-action="xchg" data-r="${r}" data-c="${c}" aria-label="Exchange a golden ten-bar on the ${valueLabel(r-c)} square for one bead on the ${valueLabel(nx[0]-nx[1])} square">${nx[1] === c ? "↑" : "←"} 10</button>`;
       }
       const count = tot && S.helpers
-        ? `<span class="count ${minus ? 'shift' : ''} ${loose(bars) >= 10 && isMul && S.phase !== 'lay' ? 'big' : ''}">${tot}</span>` : '';
+        ? `<span class="count ${loose(bars) >= 10 && S.phase !== 'lay' ? 'big' : ''}">${tot}</span>` : '';
       // the card and count slide aside on hover (CSS), so beads use the full square;
       // only a step button, which has to stay clickable, gets its own strip at the bottom
-      const top = 3;
-      let bottom = chip ? chipH + 6 : 3;
-      if (cs - top - bottom < 14) bottom = 3; // only on tiny phone squares does the button float over the beads
+      // the multiplicand cards straddle the line under their row, so keep beads clear of them
+      let top = r === P.r0 - 1 && aDig(P.r0 - c) !== undefined ? cardH/2 + 3 : 3;
+      let bottom = Math.max(chip ? chipH + 6 : 3, card ? cardH/2 + 3 : 3);
+      if (cs - top - bottom < 14){ top = 3; bottom = 3; } // only on tiny phone squares do the cards float over the beads
       const wrap = el.querySelector('.bars');
       wrap.innerHTML = '';
       wrap.style.top = top + 'px'; wrap.style.bottom = bottom + 'px';
@@ -712,13 +645,12 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
           wrap.appendChild(be);
         });
       }
-      el.querySelectorAll('.count,.xchg,.card,.qminus,.qplus').forEach(n => n.remove());
-      el.insertAdjacentHTML('beforeend', card + minus + plus + count + chip);
+      el.querySelectorAll('.count,.xchg,.card,.dpt').forEach(n => n.remove());
+      el.insertAdjacentHTML('beforeend', card + count + chip);
       el.classList.toggle('active-row', r === R);
-      el.classList.toggle('qrow', !isMul && r === P.r0 && S.phase !== 'done');
       el.classList.toggle('wrong', S.wrong.includes(key(r,c)));
       el.classList.toggle('hint', S.hintCell === key(r,c));
-      el.classList.toggle('edge', isMul && ['slide','fgroup','exchange'].includes(S.phase) && onL(r,c));
+      el.classList.toggle('edge', ['slide','fgroup','exchange'].includes(S.phase) && onL(r,c));
       el.setAttribute('aria-label', `${valueLabel(r-c)} square, row ${valueLabel(r)}, column ${valueLabel(-c)}: ${tot} bead${tot === 1 ? '' : 's'}`);
     }
     if (!reduced){
@@ -742,106 +674,107 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
 
   function renderProblem(){
     const P = S.prob, done = S.phase === 'done';
-    const isMul = P.type === 'mul';
-    const a = isMul ? P.Astr : P.dividendStr, b = isMul ? P.Mstr : P.Dstr;
-    let note;
-    if (isMul){
-      note = `The multiplicand ${P.Astr} lies on the board, its last digit on the square nearest the right edge. The multiplier ${P.Mstr} goes on the right edge, its units card level with the multiplicand.`;
-    } else {
-      note = `Lay the divisor ${P.Dstr} on the right edge with its last card on the bottom row. The row of its units card${P.Dstr.startsWith('0') ? ' (the 0)' : ''} is where the quotient will be built. The dividend ${P.dividendStr} waits in the cups.`;
-    }
+    const zero = u => u.startsWith('0') ? ' (a 0 card holds the units place)' : '';
+    const note = `Units × units = units. The white cards ${P.Astr} lie below the row of a units square, smallest digit touching the wood${zero(P.Astr)}. The gray cards ${P.Mstr} go on the right edge, units card level with that row${zero(P.Mstr)}. A black disk marks each decimal point.`;
     $('#problem').innerHTML =
-      `<div class="eyebrow">${isMul ? 'Multiplication' : 'Division'} · ${cap(S.level)}${S.decimal ? (isMul ? ' · decimal multiplier' : ' · decimal divisor') : ''}</div>
-       <div class="eq"><span>${a}</span><span class="op">${isMul ? '×' : '÷'}</span><span>${b}</span><span class="op">=</span><span class="ans ${done ? 'shown' : ''}">${done ? microStr(P.answer) : '?'}</span></div>
+      `<div class="eyebrow">Multiplication · ${cap(S.level)}${S.decimal ? ' · decimal multiplier' : ''}</div>
+       <div class="eq"><span>${P.Astr}</span><span class="op">×</span><span>${P.Mstr}</span><span class="op">=</span><span class="ans ${done ? 'shown' : ''}">${done ? microStr(P.answer) : '?'}</span></div>
        <p class="note">${note}</p>`;
   }
 
   const ROW_SUBSTEPS = [['lay','Lay the bars'],['group','Make tens'],['rowx','Exchange tens, right to left'],['partial','Write the partial product']];
   function stepList(){
-    if (S.mode === 'mul') return [...S.prob.seq.map(m => `Multiply by the ${mDig(m)} card (${placeWord(m)})`), 'Slide down the diagonals', 'Make tens', 'Exchange tens, right to left', 'Read the product'];
-    return ['Share out the dividend', 'Read the quotient'];
+    return [...S.prob.seq.map(m => `Multiply by the ${mDig(m)} card (${placeWord(m)})`), 'Slide down the diagonals', 'Make tens', 'Exchange tens, right to left', 'Read the product'];
   }
   function stepIndex(){
-    if (S.mode === 'mul'){
-      const n = S.prob.seq.length;
-      if (MULTIPLYING.includes(S.phase)) return S.mi;
-      return {slide:n, fgroup:n+1, exchange:n+2, read:n+3, done:n+4}[S.phase];
-    }
-    return {distribute:0, read:1, done:2}[S.phase];
+    const n = S.prob.seq.length;
+    if (MULTIPLYING.includes(S.phase)) return S.mi;
+    return {slide:n, fgroup:n+1, exchange:n+2, read:n+3, done:n+4}[S.phase];
   }
   function instruction(){
     const P = S.prob;
-    if (S.mode === 'mul'){
-      if (S.phase === 'lay'){
-        const m = curM(), d = mDig(m);
-        const jx = P.aPlaces[P.aPlaces.length-1], a = aDig(jx);
-        const where = m === 0 ? 'on the same squares as the multiplicand cards'
-          : m > 0 ? `${m} row${m > 1 ? 's' : ''} above the multiplicand cards` : `${-m} row${m < -1 ? 's' : ''} below the multiplicand cards`;
-        const first = S.mi === 0 ? ' Always begin with the lowest card of the multiplier.' : '';
-        return `Multiply by the <b>${d}</b> card (${placeWord(m)}).${first} Its bars go ${where}, in the lit row. For each multiplicand card, lay that digit's bar ${NUMW[d]} time${d > 1 ? 's' : ''}.
-          <span class="eg">For the ${a} card: ${NUMW[d]} ${a}-bar${d > 1 ? 's' : ''} ${m === 0 ? 'on its square' : m > 0 ? 'above it' : 'below it'}.</span>`;
-      }
-      if (S.phase === 'group') return laneNeedsGroup()
-        ? `Before exchanging, tidy each crowded square. Tap <b>Make tens</b> and build an equal set: a golden ten-bar for every full ten, plus one bar for the change.`
-        : laneHasTens() ? `Every square in this row is already in golden ten-bars and change, so there is nothing to make into tens. Continue to exchange the tens.`
-        : `No square in this row holds ten or more beads, so there is nothing to make into tens or exchange.`;
-      if (S.phase === 'rowx') return `Now exchange <b>right to left</b>. Tap <b>← 10</b>, or drag the golden ten-bar onto the square to its left: the ten-bar leaves and one bead arrives there. If a square reaches ten again, make tens there first.`;
-      if (S.phase === 'partial') return `Read this row as a number (each square's beads are one digit, the square gives the place) and write the <b>partial product</b> on your paper.`;
-      if (S.phase === 'slide') return `Every multiplier card is turned over. Move all the bars <b>down the diagonal</b> to the lowest row (whole numbers stop at the left column), or press Slide all.`;
-      if (S.phase === 'fgroup') return laneNeedsGroup()
-        ? `The edge squares hold the sums of the diagonals. Tap <b>Make tens</b> on each crowded square and build its tens and change.`
-        : laneHasTens() ? `Every edge square is already in golden ten-bars and change, so there is nothing to make into tens. Continue to exchange the tens.`
-        : `No edge square holds ten or more beads, so there is nothing to make into tens or exchange.`;
-      if (S.phase === 'exchange') return `Exchange from the smallest square to the largest: along the bottom row to the corner, then up the left column. Tap <b>← 10</b> (<b>↑ 10</b> on the left column), or drag the golden ten-bar onto the next square.`;
-      if (S.phase === 'read') return `Read the whole numbers up the left column and the decimals along the bottom row; the 1 square in the corner is the units. Write the product.`;
-      return `Solved: ${P.Astr} × ${P.Mstr} = <b>${microStr(P.answer)}</b>.`;
+    if (S.phase === 'lay'){
+      const m = curM(), d = mDig(m);
+      const jx = P.aPlaces[P.aPlaces.length-1], a = aDig(jx);
+      const ord = n => ['','','second','third','fourth','fifth','sixth','seventh'][n];
+      const where = m === 0 ? 'in the row just above the multiplicand cards' : m === -1 ? 'in the row just below the multiplicand cards'
+        : m > 0 ? `in the ${ord(m + 1)} row above the multiplicand cards` : `in the ${ord(-m)} row below the multiplicand cards`;
+      const first = S.mi === 0 ? ' Always begin with the lowest card of the multiplier; the other cards are turned face down.' : ' The card you finished is turned face down and this one is turned up.';
+      const est = S.mi === 0 ? (e => `<span class="aside">Estimate first: ${e.a} × ${e.m} = ${e.v}, so the product should be somewhere around ${e.v}.</span>`)(estimate()) : '';
+      return `Multiply by the <b>${d}</b> card (${placeWord(m)}).${first} Its bars go ${where}, in the lit row level with the card. For each multiplicand card, lay that digit's bar ${NUMW[d]} time${d > 1 ? 's' : ''}.
+        <span class="eg">For the ${a} card: ${NUMW[d]} ${a}-bar${d > 1 ? 's' : ''} ${m === 0 ? 'on the square just above it' : m > 0 ? 'above it' : 'below it'}.</span>${est}`;
     }
-    const aside = `<span class="aside">The Montessori albums teach decimal division on the decimal board. This division mode is this game's own mirror of the album's checkerboard multiplication.</span>`;
-    if (S.phase === 'distribute') return `The divisor's last card sits on the bottom row, so its units card marks the quotient row (lit). Tap a square in that row to add one to that place of the quotient. For each divisor card, that many beads move from the matching cup to the square in the card's row. Start with the largest place. When a cup runs short, <b>break</b> a bead from the cup above into ten.${aside}`;
-    if (S.phase === 'read') return `Every bead has been shared out, with none left over. Read the quotient cards in the lit row; the card on the green 1 square is the units digit.`;
-    return `Solved: ${P.dividendStr} ÷ ${P.Dstr} = <b>${trimZeros(P.qStr)}</b>.`;
+    if (S.phase === 'group') return laneNeedsGroup()
+      ? `Before exchanging, tidy each crowded square. Tap <b>Make tens</b> and build an equal set: a golden ten-bar for every full ten, plus one bar for the change.`
+      : laneHasTens() ? `Every square in this row is already in golden ten-bars and change, so there is nothing to make into tens. Continue to exchange the tens.`
+      : `No square in this row holds ten or more beads, so there is nothing to make into tens or exchange.`;
+    if (S.phase === 'rowx') return `Now exchange <b>right to left</b>. Tap <b>← 10</b>, or drag the golden ten-bar onto the square to its left: the ten-bar leaves and one bead arrives there. If a square reaches ten again, make tens there first.`;
+    if (S.phase === 'partial') return `Record the <b>partial product</b>: read this row's bead counts from left to right, one digit per square, down to the square nearest the wood. Don't worry yet about what it is worth; the decimal points come later. On the paper, its last digit goes ${S.mi === 0 ? 'under the rightmost digits of the problem' : 'one category further left for each place the multiplier card moved up'}.`;
+    if (S.phase === 'slide') return `Every multiplier card is turned over. Move all the bars <b>down the diagonal</b> to the lowest row (whole numbers stop at the left column), or press Slide all.`;
+    if (S.phase === 'fgroup') return laneNeedsGroup()
+      ? `The edge squares hold the sums of the diagonals. Tap <b>Make tens</b> on each crowded square and build its tens and change.`
+      : laneHasTens() ? `Every edge square is already in golden ten-bars and change, so there is nothing to make into tens. Continue to exchange the tens.`
+      : `No edge square holds ten or more beads, so there is nothing to make into tens or exchange.`;
+    if (S.phase === 'exchange') return `Exchange from the smallest square to the largest: along the bottom row to the corner, then up the left column. Tap <b>← 10</b> (<b>↑ 10</b> on the left column), or drag the golden ten-bar onto the next square.`;
+    if (S.phase === 'read') return `Read the whole numbers up the left column and the decimals along the bottom row; the 1 square in the corner is the units. Write the product. Does it match the paper, and is it near your estimate of ${estimate().v}?`;
+    return `Solved: ${P.Astr} × ${P.Mstr} = <b>${microStr(P.answer)}</b>.`;
   }
   function actionButtons(){
     if (S.phase === 'done') return `<button type="button" class="btn primary" data-action="new">Next problem →</button>`;
     const hint = `<button type="button" class="btn" data-action="hint">Hint</button>`;
-    if (S.mode === 'mul'){
-      if (S.phase === 'lay') return `<button type="button" class="btn primary" data-action="check-layout">Check this row</button>${hint}<button type="button" class="btn" data-action="clear">Clear row</button>`;
-      if (GROUPING.includes(S.phase)) return laneNeedsGroup() ? hint : `<button type="button" class="btn primary" data-action="skip-group">Continue</button>`;
-      if (S.phase === 'rowx') return hint;
-      if (S.phase === 'partial') return hint;
-      if (S.phase === 'slide') return `<button type="button" class="btn primary" data-action="slide-all">Slide all</button>${hint}`;
-      if (S.phase === 'exchange') return hint;
-      return hint;
-    }
-    if (S.phase === 'distribute') return `${hint}<button type="button" class="btn" data-action="reset-div">Start over</button>`;
+    if (S.phase === 'lay') return `<button type="button" class="btn primary" data-action="check-layout">Check this row</button>${hint}<button type="button" class="btn" data-action="clear">Clear row</button>`;
+    if (GROUPING.includes(S.phase)) return laneNeedsGroup() ? hint : `<button type="button" class="btn primary" data-action="skip-group">Continue</button>`;
+    if (S.phase === 'rowx') return hint;
+    if (S.phase === 'partial') return hint;
+    if (S.phase === 'slide') return `<button type="button" class="btn primary" data-action="slide-all">Slide all</button>${hint}`;
+    if (S.phase === 'exchange') return hint;
     return hint;
   }
   function paperHTML(){
-    if (S.mode !== 'mul') return '';
     const P = S.prob;
-    // numbers line up on the decimal point; an underline is drawn under the row that closes a sum
-    const line = (op, num, note='', cls='') => {
-      const [w, f] = num.split('.');
-      return `<span class="op">${op}</span><span class="w ${cls}">${w}</span><span class="f ${cls}">${f !== undefined ? '.' + f : ''}</span><span class="nt">${note}</span>`;
+    // Album layout: the rightmost digits of both factors share a column; each partial product's last
+    // digit sits in its own category, one further left each time. Decimal points are added once
+    // every partial product is written. Columns count categories from the right.
+    const lines = [], shift = P.p + P.k;
+    const put = (str, off0) => {
+      const out = {}; let off = off0, dp = false;
+      for (let i=str.length-1; i>=0; i--){
+        if (str[i] === '.'){ dp = true; continue; }
+        out[off++] = {ch:str[i], dp}; dp = false;
+      }
+      if (dp) out[off] = {ch:'', dp:true};
+      return out;
     };
-    const last = S.partials.length - 1;
-    let h = `<div class="paper" aria-label="Your paper"><span class="pt">Your paper</span>` + line('', P.Astr) + line('×', P.Mstr, '', 'u');
+    const pointed = !MULTIPLYING.includes(S.phase), last = S.partials.length - 1;
+    lines.push({op:'', cols:put(P.Astr, 0)});
+    lines.push({op:'×', cols:put(P.Mstr, 0), cls:'u'});
     S.partials.forEach((pp,i) => {
+      const str = pointed && pp.e < 0 ? fmtFixed(Number(pp.digs), -pp.e).replace(/^0\./, '.') : pp.digs;
       const note = `${P.Astr} × ${trimZeros(fmtFixed(pp.d, Math.max(0,-pp.m)) + '0'.repeat(Math.max(0,pp.m)))}`;
-      h += line(i === 0 || S.partials.length < 2 ? '' : '+', microStr(pp.v), note, S.phase === 'done' && i === last ? 'u' : '');
+      lines.push({op:'', cols:put(str, pp.e + shift), note, cls: S.phase === 'done' && i === last ? 'u' : ''});
     });
-    if (S.phase === 'done') h += line('', microStr(P.answer), 'product', 'tot');
+    if (S.phase === 'done'){
+      const t = microStr(P.answer), dec = t.includes('.') ? t.split('.')[1].length : 0;
+      lines.push({op:'', cols:put(t, shift - dec), note:'product', cls:'tot'});
+    }
+    const n = Math.max(...lines.flatMap(l => Object.keys(l.cols).map(Number))) + 1;
+    let h = `<div class="paper" style="--n:${n}" aria-label="Your paper"><span class="ptitle">Your paper</span>`;
+    lines.forEach(l => {
+      h += `<span class="op">${l.op}</span>`;
+      for (let o=n-1; o>=0; o--){ const c = l.cols[o]; h += `<span class="d ${c && c.dp ? 'dp' : ''} ${l.cls || ''}">${c ? c.ch : ''}</span>`; }
+      h += `<span class="nt">${l.note || ''}</span>`;
+    });
     return h + '</div>';
   }
   function subSteps(isCurrent){
-    if (!isCurrent || S.mode !== 'mul' || !MULTIPLYING.includes(S.phase)) return '';
+    if (!isCurrent || !MULTIPLYING.includes(S.phase)) return '';
     const k = ROW_SUBSTEPS.findIndex(x => x[0] === S.phase);
     return `<li class="subwrap"><ol class="substeps">${ROW_SUBSTEPS.map((x,i) => `<li class="${i < k ? 'done' : i === k ? 'cur' : ''}">${x[1]}</li>`).join('')}</ol></li>`;
   }
   function renderSteps(){
     const steps = stepList(), idx = stepIndex();
     const partial = S.phase === 'partial'
-      ? `<div class="partial-row"><input id="partial" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Partial product" placeholder="partial product"><button type="button" class="btn primary" data-action="check-partial">Write it</button></div>` : '';
+      ? `<div class="partial-row"><input id="partial" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Partial product" placeholder="digits, e.g. 7298"><button type="button" class="btn primary" data-action="check-partial">Write it</button></div>` : '';
     $('#stepsPad').innerHTML =
       `<ol class="steps">${steps.map((s,i) =>
         `<li class="${i < idx ? 'done' : i === idx ? 'current' : ''}"><span class="dot">${i < idx ? '✓' : i+1}</span>${s}</li>` + subSteps(i === idx)).join('')}</ol>
@@ -853,36 +786,18 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   }
   function renderTool(){
     const pad = $('#toolPad');
-    if (S.mode === 'mul'){
-      const on = canBox();
-      const sub = on
-        ? (S.selected ? `Holding the ${S.selected}-bar. Tap squares in the lit row to lay it down; tap the compartment again (or press Esc) to put it back.` : 'Tap a compartment to pick up a bar, or drag one straight onto the lit row.')
-        : 'Closed for now. Open again when the next multiplier card comes up.';
-      pad.innerHTML =
-        `<div class="pad-head"><h2>Bead box</h2><span class="sub">${sub}</span></div>
-         ${boxHTML('', n => `aria-pressed="${S.selected === n}" ${on ? '' : 'disabled'}`, on ? '' : 'closed')}`;
-      fillDecor(pad);
-    } else {
-      const keys = trayKeys(), maxE = keys[0], minE = keys[keys.length-1];
-      pad.innerHTML =
-        `<div class="pad-head"><h2>Dividend cups</h2><span class="sub">${S.prob.dividendStr} as loose beads, one cup per place.</span></div>
-         <div class="cups">${keys.map(e => {
-           const n = S.tray[e], shown = Math.min(n, 30);
-           return `<div class="cup ${S.hintCup === e ? 'hint' : ''}" data-cup="${e}">
-             <span class="cup-lab" style="--sq:${sqColor(e)};--sqi:${sqInk(e)}">${valueLabel(e)}</span>
-             <div class="bowl"><div class="loose" style="--c:${sqColor(e)}">${'<i class="bead"></i>'.repeat(shown)}${n > shown ? `<em>+${n-shown}</em>` : ''}</div></div>
-             <b class="cup-n">${n}</b>
-             <div class="cup-act">
-               <button type="button" class="mini" data-action="break" data-e="${e}" ${n > 0 && e > minE && S.phase !== 'done' ? '' : 'disabled'} title="Trade one ${valueLabel(e)} bead for ten ${valueLabel(e-1)} beads">Break into ten ↓</button>
-               <button type="button" class="mini" data-action="bundle" data-e="${e}" ${n >= 10 && e < maxE && S.phase !== 'done' ? '' : 'disabled'} title="Trade ten ${valueLabel(e)} beads for one ${valueLabel(e+1)} bead">Bundle ten ↑</button>
-             </div></div>`;
-         }).join('')}</div>`;
-    }
+    const on = canBox();
+    const sub = on
+      ? (S.selected ? `Holding the ${S.selected}-bar. Tap squares in the lit row to lay it down; tap the compartment again (or press Esc) to put it back.` : 'Tap a compartment to pick up a bar, or drag one straight onto the lit row.')
+      : 'Closed for now. Open again when the next multiplier card comes up.';
+    pad.innerHTML =
+      `<div class="pad-head"><h2>Bead box</h2><span class="sub">${sub}</span></div>
+       ${boxHTML('', n => `aria-pressed="${S.selected === n}" ${on ? '' : 'disabled'}`, on ? '' : 'closed')}`;
+    fillDecor(pad);
   }
   function renderAnswer(){
     const input = $('#answer');
     const ready = S.phase === 'read';
-    $('#answerLab').textContent = S.mode === 'mul' ? 'Product' : 'Quotient';
     input.disabled = !ready;
     input.placeholder = ready ? 'type it, e.g. 12.35' : S.phase === 'done' ? '' : 'finish the beads first';
     $('#checkBtn').disabled = !ready;
@@ -890,12 +805,9 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
     $('#tally').textContent = `Solved on this device: ${solved}`;
   }
   function renderControls(){
-    $('#modeMul').setAttribute('aria-pressed', S.mode === 'mul');
-    $('#modeDiv').setAttribute('aria-pressed', S.mode === 'div');
     ['easy','medium','hard'].forEach(l => $('#lv' + cap(l)).setAttribute('aria-pressed', S.level === l));
     $('#helpers').checked = S.helpers;
     $('#decimalOpt').checked = S.decimal;
-    $('#decLab').textContent = S.mode === 'mul' ? 'Decimal × decimal' : 'Decimal ÷ decimal';
     document.body.classList.toggle('armed', !!S.selected);
   }
   function render(){
@@ -1001,22 +913,24 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   }
   function checkPartial(){
     const input = $('#partial'), msgEl = $('#msg');
-    const v = parseMicro(input.value), want = rowValue(curRow());
-    if (v === want){
-      S.partials.push({m:curM(), d:mDig(curM()), v:want});
+    // the album records just the row's digits; the value with its decimal point is accepted too
+    const raw = input.value.trim().replace(/[,\s]/g,''), v = parseMicro(raw), want = rowValue(curRow());
+    const e = curM() - S.prob.p, digs = String(want / Math.pow(10, e + 6));
+    if (v !== null && (v === want || (!raw.includes('.') && raw.replace(/^0+(?=\d)/,'') === digs))){
+      S.partials.push({m:curM(), d:mDig(curM()), v:want, e, digs});
       S.mi++; clearHints();
       if (S.mi < S.prob.seq.length){
         S.phase = 'lay';
-        setMsg(`Written. The card is turned over. Next, multiply by the ${mDig(curM())} card (${placeWord(curM())}).`, 'good');
-      } else if (allOnL()) finishSlide();
-      else { S.phase = 'slide'; setMsg('Every partial product is written. Now move the bars down the diagonals.', 'good'); }
+        setMsg(`Written. Turn that card face down and turn up the ${mDig(curM())} card (${placeWord(curM())}).`, 'good');
+      } else if (allOnL()){ finishSlide(); setMsg('Every partial product is written, and the decimal points are added: each digit sits in the same category as its square on the board. ' + S.msg.text, 'good'); }
+      else { S.phase = 'slide'; setMsg('Every partial product is written, and the decimal points are added: each digit sits in the same category as its square on the board. Now slide the bars down the diagonals to find out how much it all is.', 'good'); }
       render();
       return;
     }
     input.classList.remove('bad'); void input.offsetWidth; input.classList.add('bad');
     msgEl.hidden = false; msgEl.className = 'msg warn';
-    msgEl.textContent = v === null ? 'Type the number, like 18.534.'
-      : (v >= 0 && sigDigits(v) === sigDigits(want)) ? 'The digits are right. Check the decimal point: which square is the units?'
+    msgEl.textContent = v === null ? 'Type the digits, like 7298.'
+      : (v >= 0 && sigDigits(v) === sigDigits(want)) ? (raw.includes('.') ? 'The digits are right, but not the decimal point. Leave it out for now; the decimal points come later.' : 'Nearly: read every square down to the one nearest the wood, writing 0 for an empty one.')
       : 'Not quite. Read the lit row from left to right: each square’s bead count is one digit.';
   }
   function finishSlide(){
@@ -1076,7 +990,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
 
   /* ---------------- make-tens modal ---------------- */
   function canOpenTens(r,c){
-    if (S.mode !== 'mul' || loose(S.cells[r][c]) < 10 || !inLane(r,c)) return false;
+    if (loose(S.cells[r][c]) < 10 || !inLane(r,c)) return false;
     if (GROUPING.includes(S.phase)) return true;
     if (EXCHANGING.includes(S.phase)){ const a = activeCell(); return !!a && a[0] === r && a[1] === c; }
     return false;
@@ -1133,7 +1047,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   }
   function renderModal(newId){
     const m = $('#modal');
-    const open = !!S.modal && S.mode === 'mul';
+    const open = !!S.modal;
     m.hidden = !open;
     document.body.classList.toggle('modal-open', open);
     if (!open) return;
@@ -1151,162 +1065,70 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   mBox.innerHTML = boxHTML('mcomp', () => '').replace(/^<div class="beadbox[^"]*">|<\/div>$/g, '');
   fillDecor(mBox);
 
-  /* ---------------- division actions ---------------- */
-  function shortfall(c){
-    const P = S.prob;
-    for (const m of P.dPlaces){
-      const d = dDig(m); if (!d) continue;
-      const e = P.r0 + m - c, have = S.tray[e];
-      if (have === undefined || have < d) return {e, d, have: have || 0, exists: have !== undefined};
-    }
-    return null;
-  }
-  const cupBowl = e => document.querySelector(`[data-cup="${e}"] .bowl`);
-  function qAdd(c){
-    const P = S.prob;
-    if (S.phase === 'done') return;
-    clearHints();
-    if (S.q[c] >= 9){ setMsg('A quotient card only goes up to 9. Share into the place to its left instead.', 'warn'); return render(); }
-    const s = shortfall(c);
-    if (s){
-      if (!s.exists){
-        setMsg(s.e > trayKeys()[0]
-          ? `There are no ${valueLabel(s.e)} beads in this dividend, so that place is too large. Try a square further right.`
-          : `This dividend has no ${valueLabel(s.e)} beads to share. Try a square further left.`, 'warn');
-      } else {
-        setMsg(`The ${valueLabel(s.e)} cup needs ${s.d} bead${s.d > 1 ? 's' : ''} but has ${s.have}. Break a larger bead into ten, or try a square further right.`, 'warn');
-        S.hintCup = s.e;
-      }
-      return render();
-    }
-    P.dPlaces.forEach(m => {
-      const d = dDig(m); if (!d) return;
-      const R = P.r0 + m, e = R - c;
-      S.tray[e] -= d;
-      fly(cupBowl(e), cellEls[key(R,c)], d, sqColor(e));
-      fresh.add(`d${R}-${c}-${S.q[c]}`);
-    });
-    S.q[c]++;
-    if (trayEmpty()){ S.phase = 'read'; setMsg('All the beads are shared out, none left over. Read the quotient.', 'good'); }
-    else if (S.msg && S.msg.tone === 'warn') setMsg(null);
-    render();
-  }
-  function qSub(c){
-    const P = S.prob;
-    if (!S.q[c] || S.phase === 'done') return;
-    clearHints();
-    P.dPlaces.forEach(m => {
-      const d = dDig(m); if (!d) return;
-      const R = P.r0 + m, e = R - c;
-      S.tray[e] += d;
-      fly(cellEls[key(R,c)], cupBowl(e), d, sqColor(e));
-    });
-    S.q[c]--;
-    if (S.phase === 'read') S.phase = 'distribute';
-    setMsg(null);
-    render();
-  }
-  function brk(e){
-    if (!(S.tray[e] > 0) || S.tray[e-1] === undefined) return;
-    fly(cupBowl(e), cupBowl(e-1), 10, sqColor(e-1));
-    S.tray[e]--; S.tray[e-1] += 10;
-    clearHints(); setMsg(`One ${valueLabel(e)} bead became ten ${valueLabel(e-1)} beads.`);
-    render();
-  }
-  function bundle(e){
-    if (!(S.tray[e] >= 10) || S.tray[e+1] === undefined) return;
-    fly(cupBowl(e), cupBowl(e+1), 10, sqColor(e));
-    S.tray[e] -= 10; S.tray[e+1]++;
-    clearHints(); setMsg(`Ten ${valueLabel(e)} beads became one ${valueLabel(e+1)} bead.`);
-    render();
-  }
-
   /* ---------------- hints ---------------- */
   function hint(){
     clearHints();
     const P = S.prob;
-    if (S.mode === 'mul'){
-      if (S.phase === 'lay'){
-        const R = curRow(), d = mDig(curM());
-        for (let c=0; c<7; c++){
-          const t = total(S.cells[R][c]), want = target(R,c);
-          if (t === want) continue;
-          S.hintCell = key(R,c);
-          if (!want) setMsg(`The ${valueLabel(R-c)} square in the lit row should be empty. Drag its bars off the board.`);
-          else {
-            const a = aDig(P.r0 - c);
-            setMsg(`This square lines up with the ${a} card: ${d} × ${a}. Lay ${NUMW[d]} ${a}-bar${d > 1 ? 's' : ''} here (${want} beads). It has ${t} now.`);
-          }
-          return render();
-        }
-        setMsg('Every square in the row matches. Press Check this row.', 'good');
-      } else if (GROUPING.includes(S.phase)){
-        for (const [r,c] of laneCells()){
-          const t = loose(S.cells[r][c]);
-          if (t < 10) continue;
-          S.hintCell = key(r,c);
-          setMsg(`The ${valueLabel(r-c)} square has ${t} beads: that is ${NUMW[Math.floor(t/10)]} ten${t >= 20 ? 's' : ''} and ${t % 10} change. Tap Make tens there.`);
-          return render();
-        }
-        setMsg(laneHasTens() ? 'These squares are already tens and change. Press Continue to exchange them.' : 'Nothing to make into tens here. Press Continue.');
-      } else if (EXCHANGING.includes(S.phase)){
-        const a = activeCell();
-        if (a){
-          const [r,c] = a, nx = nextInLane(r,c);
-          S.hintCell = key(r,c);
-          setMsg(loose(S.cells[r][c]) >= 10
-            ? `The ${valueLabel(r-c)} square reached ten again. Make tens there before exchanging.`
-            : `Start with the ${valueLabel(r-c)} square: its golden ten-bar becomes one bead on the ${valueLabel(nx[0]-nx[1])} square. Tap its ← 10 button.`);
-          return render();
-        }
-      } else if (S.phase === 'partial'){
-        const R = curRow();
-        for (let c=0; c<7; c++){
-          const t = total(S.cells[R][c]);
-          if (!t) continue;
-          S.hintCell = key(R,c);
-          setMsg(`Start at the left: the ${valueLabel(R-c)} square has ${t} bead${t > 1 ? 's' : ''}, so the first digit is ${t} in the ${placeWord(R-c)} place. Write 0 for any empty place until you reach the smallest one.`);
-          return render();
-        }
-      } else if (S.phase === 'slide'){
-        for (let r=1; r<7; r++) for (let c=1; c<7; c++) if (S.cells[r][c].length){
-          const [tr] = cellForE(r-c);
-          S.hintCell = key(r,c);
-          setMsg(`These bars are worth ${valueLabel(r-c)} per bead. Drag them down-left along the diagonal to the ${valueLabel(r-c)} square on the ${tr === 0 ? 'bottom row' : 'left column'}.`);
-          return render();
-        }
-      } else if (S.phase === 'read'){
-        for (let e=6; e>=-6; e--){
-          const [r,c] = cellForE(e), t = total(S.cells[r][c]);
-          if (t){
-            S.hintCell = key(r,c);
-            setMsg(`Start with the ${valueLabel(e)} square: ${t} bead${t > 1 ? 's' : ''}, so your first digit is ${t}. Go down to the corner, then along the bottom. The decimal point comes right after the corner (1) square.`);
-            return render();
-          }
-        }
-      }
-      return render();
-    }
-    if (S.phase === 'distribute'){
+    if (S.phase === 'lay'){
+      const R = curRow(), d = mDig(curM());
       for (let c=0; c<7; c++){
-        if (S.q[c] > qDigAt(c)){ S.hintCell = key(P.r0,c); setMsg(`The ${placeWord(P.r0-c)} card is too high. Take one back with −.`); return render(); }
+        const t = total(S.cells[R][c]), want = target(R,c);
+        if (t === want) continue;
+        S.hintCell = key(R,c);
+        if (!want) setMsg(`The ${valueLabel(R-c)} square in the lit row should be empty. Drag its bars off the board.`);
+        else {
+          const a = aDig(P.r0 - c);
+          setMsg(`This square lines up with the ${a} card: ${d} × ${a}. Lay ${NUMW[d]} ${a}-bar${d > 1 ? 's' : ''} here (${want} beads). It has ${t} now.`);
+        }
+        return render();
       }
+      setMsg('Every square in the row matches. Press Check this row.', 'good');
+    } else if (GROUPING.includes(S.phase)){
+      for (const [r,c] of laneCells()){
+        const t = loose(S.cells[r][c]);
+        if (t < 10) continue;
+        S.hintCell = key(r,c);
+        setMsg(`The ${valueLabel(r-c)} square has ${t} beads: that is ${NUMW[Math.floor(t/10)]} ten${t >= 20 ? 's' : ''} and ${t % 10} change. Tap Make tens there.`);
+        return render();
+      }
+      setMsg(laneHasTens() ? 'These squares are already tens and change. Press Continue to exchange them.' : 'Nothing to make into tens here. Press Continue.');
+    } else if (EXCHANGING.includes(S.phase)){
+      const a = activeCell();
+      if (a){
+        const [r,c] = a, nx = nextInLane(r,c);
+        S.hintCell = key(r,c);
+        setMsg(loose(S.cells[r][c]) >= 10
+          ? `The ${valueLabel(r-c)} square reached ten again. Make tens there before exchanging.`
+          : `Start with the ${valueLabel(r-c)} square: its golden ten-bar becomes one bead on the ${valueLabel(nx[0]-nx[1])} square. Tap its ← 10 button.`);
+        return render();
+      }
+    } else if (S.phase === 'partial'){
+      const R = curRow();
       for (let c=0; c<7; c++){
-        if (S.q[c] >= qDigAt(c)) continue;
-        const s = shortfall(c);
-        if (!s){ S.hintCell = key(P.r0,c); setMsg(`Share into the ${placeWord(P.r0-c)}: tap the ${valueLabel(P.r0-c)} square in the lit row.`); return render(); }
-        let e2 = s.e + 1;
-        while (S.tray[e2] === 0) e2++;
-        if (S.tray[e2] > 0){ S.hintCup = e2; setMsg(`The ${valueLabel(s.e)} cup is short. Break a bead from the ${valueLabel(e2)} cup into ten smaller beads.`); }
-        else if (S.tray[s.e-1] >= 10){ S.hintCup = s.e-1; setMsg(`The ${valueLabel(s.e)} cup is short. Bundle ten ${valueLabel(s.e-1)} beads into one.`); }
-        else setMsg('Take some beads back from the board and share the larger places first.');
+        const t = total(S.cells[R][c]);
+        if (!t) continue;
+        S.hintCell = key(R,c);
+        setMsg(`Start at the left: the ${valueLabel(R-c)} square has ${t} bead${t > 1 ? 's' : ''}, so the first digit is ${t}. Write one digit per square, 0 for an empty one, until you reach the square nearest the wood.`);
+        return render();
+      }
+    } else if (S.phase === 'slide'){
+      for (let r=1; r<7; r++) for (let c=1; c<7; c++) if (S.cells[r][c].length){
+        const [tr] = cellForE(r-c);
+        S.hintCell = key(r,c);
+        setMsg(`These bars are worth ${valueLabel(r-c)} per bead. Drag them down-left along the diagonal to the ${valueLabel(r-c)} square on the ${tr === 0 ? 'bottom row' : 'left column'}.`);
         return render();
       }
     } else if (S.phase === 'read'){
-      S.hintCell = key(P.r0, P.r0);
-      setMsg('Read the cards in the lit row from left to right. The card on the green 1 square is the units digit; the decimal point goes right after it.');
+      for (let e=6; e>=-6; e--){
+        const [r,c] = cellForE(e), t = total(S.cells[r][c]);
+        if (t){
+          S.hintCell = key(r,c);
+          setMsg(`Start with the ${valueLabel(e)} square: ${t} bead${t > 1 ? 's' : ''}, so your first digit is ${t}. Go down to the corner, then along the bottom. The decimal point comes right after the corner (1) square.`);
+          return render();
+        }
+      }
     }
-    render();
+    return render();
   }
 
   /* ---------------- answers ---------------- */
@@ -1320,7 +1142,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
       S.phase = 'done'; solved++; clearHints();
       try { localStorage.setItem('decimal-checkerboard-solved', solved); } catch(e){}
       note.className = 'ans-note good';
-      note.textContent = S.mode === 'mul' ? 'Correct! That is the product.' : 'Correct! That is the quotient.';
+      note.textContent = 'Correct! That is the product.';
       setMsg(null);
       render(); celebrate();
       return;
@@ -1330,18 +1152,15 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
     if (v >= 0 && sigDigits(v) === sigDigits(S.prob.answer))
       note.textContent = 'The digits are right. Check where the decimal point goes: it sits right after the units digit.';
     else
-      note.textContent = S.mode === 'mul'
-        ? 'Not quite. Count the beads on each edge square again: the count is the digit, the square gives its place.'
-        : 'Not quite. Read the quotient cards left to right; the one on the green 1 square is the units.';
+      note.textContent = 'Not quite. Count the beads on each edge square again: the count is the digit, the square gives its place.';
   }
 
   /* ---------------- new problem ---------------- */
   function newProblem(){
-    S.prob = S.mode === 'mul' ? genMul(S.level, S.decimal) : genDiv(S.level, S.decimal);
-    S.phase = S.mode === 'mul' ? 'lay' : 'distribute';
+    S.prob = genMul(S.level, S.decimal);
+    S.phase = 'lay';
     S.mi = 0; S.partials = [];
-    S.cells = emptyCells(); S.q = [0,0,0,0,0,0,0];
-    S.tray = S.mode === 'div' ? initTray(S.prob) : {};
+    S.cells = emptyCells();
     S.selected = null; S.wrong = []; clearHints(); setMsg(null); S.modal = null; S.mMsg = null;
     const input = $('#answer'); input.value = ''; input.classList.remove('bad');
     $('#ansNote').textContent = ''; $('#ansNote').className = 'ans-note';
@@ -1353,8 +1172,7 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
     const t = e.target.closest('[data-action]');
     if (t && !t.disabled){
       const a = t.dataset.action;
-      if (a === 'mode'){ if (S.mode !== t.dataset.v){ S.mode = t.dataset.v; newProblem(); } }
-      else if (a === 'level'){ S.level = t.dataset.v; newProblem(); }
+      if (a === 'level'){ S.level = t.dataset.v; newProblem(); }
       else if (a === 'new') newProblem();
       else if (a === 'check-layout') checkLayout();
       else if (a === 'check-partial') checkPartial();
@@ -1367,10 +1185,6 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
       else if (a === 'm-check') mCheck();
       else if (a === 'm-clear'){ if (S.modal){ S.modal.right = []; S.mMsg = null; renderModal(); } }
       else if (a === 'm-cancel') closeTens();
-      else if (a === 'qminus') qSub(Number(t.dataset.c));
-      else if (a === 'break') brk(Number(t.dataset.e));
-      else if (a === 'bundle') bundle(Number(t.dataset.e));
-      else if (a === 'reset-div'){ S.q = [0,0,0,0,0,0,0]; S.tray = initTray(S.prob); clearHints(); setMsg('The beads are back in the cups.'); render(); }
       else if (a === 'check-answer') checkAnswer();
       return;
     }
@@ -1383,16 +1197,14 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
     const cell = e.target.closest('.cell');
     if (!cell) return;
     const r = Number(cell.dataset.r), c = Number(cell.dataset.c);
-    if (S.mode === 'div' && r === S.prob.r0) qAdd(c);
-    else if (canOpenTens(r,c)) openTens(r,c);
+    if (canOpenTens(r,c)) openTens(r,c);
     else if (S.selected && canBox()) addBar(r, c, S.selected);
   });
   board.addEventListener('keydown', e => {
     const cell = e.target.closest('.cell');
     if (!cell || !(e.key === 'Enter' || e.key === ' ')) return;
     const r = Number(cell.dataset.r), c = Number(cell.dataset.c);
-    if (S.mode === 'div' && r === S.prob.r0){ e.preventDefault(); qAdd(c); }
-    else if (S.selected && canBox()){ e.preventDefault(); addBar(r, c, S.selected); }
+    if (S.selected && canBox()){ e.preventDefault(); addBar(r, c, S.selected); }
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && S.modal){ closeTens(); return; }
@@ -1516,9 +1328,10 @@ input.bad{border-color:var(--warn)!important; animation:shake .35s}
   /* ---------------- boot ---------------- */
   function start(data){
     const saved = data && data.state;
-    if (saved && saved.prob && saved.prob.r0 !== undefined) Object.assign(S, saved);
+    // only restore a multiplication problem saved in the current format
+    if (saved && saved.prob && saved.prob.type === 'mul' && saved.partials?.every(pp => pp.digs !== undefined)){ delete saved.mode; Object.assign(S, saved); }
     buildBoard();
-    if (!S.prob || S.prob.r0 === undefined) newProblem(); else render();
+    if (!S.prob || S.prob.type !== 'mul') newProblem(); else render();
   }
   try { window.claude?.hot?.snapshot?.(() => ({state: JSON.parse(JSON.stringify(S))})); } catch(e){}
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});

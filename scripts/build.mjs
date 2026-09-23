@@ -18,7 +18,7 @@ ${extra}</head>
 
 writeFileSync(new URL("../index.html", import.meta.url), head() + body + "\n</body>\n</html>\n");
 
-const meta = `<meta name="description" content="Multiply and divide decimals on the Montessori decimal checkerboard with bead bars, number cards and exchanges.">
+const meta = `<meta name="description" content="Multiply by a decimal on the Montessori decimal checkerboard with bead bars, number cards and exchanges.">
 <meta name="theme-color" content="#212225">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='16' height='16' fill='%235e9f3b'/%3E%3Crect x='16' width='16' height='16' fill='%23cd2f2c'/%3E%3Crect y='16' width='16' height='16' fill='%231f4c9b'/%3E%3Crect x='16' y='16' width='16' height='16' fill='%237db9e3'/%3E%3C/svg%3E">
 `;
